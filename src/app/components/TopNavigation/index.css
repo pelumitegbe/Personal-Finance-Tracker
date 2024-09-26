@@ -1,0 +1,44 @@
+.top-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 100px;
+  padding: 5px;
+  /* background-color: #ececec; */
+  border-bottom: 1px solid #dadada;
+}
+
+.logo {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-size: 1em;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #b4b4b4;
+}
+
+.signup-button button {
+  border-radius: 20px;
+  padding: 10px 20px;
+  background-color: #d6d6d6;
+  border: none;
+  color: #646464;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signup-button button:hover {
+  background-color: #ffffff;
+  color: #b4b4b4;
+}
