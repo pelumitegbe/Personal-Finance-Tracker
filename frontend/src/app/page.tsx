@@ -1,65 +1,49 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import TransactionForm from '../app/components/TransactionForm'
-import TransactionList from '../app/components/TransactionList'
-import { Transaction, NewTransaction } from '../app/lib/types'
+import "./index.css";
+import TopNavigation from "./components/TopNavigation";
 
-export default function Home() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-
-  const addTransaction = (transaction: NewTransaction) => {
-    const newTransaction: Transaction = {
-      ...transaction,
-      id: Date.now(),
-    }
-    setTransactions((prevTransactions) => [...prevTransactions, newTransaction])
-  }
-
+export default function landing() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        minHeight: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f7fafc', // equivalent to Tailwind's bg-gray-100
-      }}
-    >
-      <main
-        style={{
-          width: '100%',
-          maxWidth: '72rem', // equivalent to Tailwind's max-w-6xl
-          padding: '1rem',
-          margin: '0 auto',
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '1.875rem', // equivalent to Tailwind's text-3xl
-            fontWeight: 'bold',
-            marginBottom: '1.5rem',
-            textAlign: 'center',
-          }}
-        >
-          Finance Tracker
-        </h1>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.5rem', // equivalent to Tailwind's space-y-6
-            alignItems: 'flex-start',
-          }}
-        >
-          <div style={{ width: '100%' }}>
-            <TransactionForm onAddTransaction={addTransaction} />
+    <div className="landing">
+      <main>
+        <TopNavigation />
+        <div className="main-content">
+          <div>
+            <h1>
+              <span>Track</span>
+              <span>Plan</span>
+              <span>Save</span>
+            </h1>
+            <p>
+              Track expenses, plan ahead, and save more—simplify your finances
+            </p>
           </div>
-          <div style={{ width: '100%' }}>
-            <TransactionList transactions={transactions} />
+          <div className="cards">
+            <div className="card">
+              <h2>Track Your Spending</h2>
+              <p>
+                Get real-time insights into where your money goes. Categorize
+                expenses and monitor spending habits effortlessly.
+              </p>
+            </div>
+            <div className="card">
+              <h2>Plan Your Budget</h2>
+              <p>
+                Set financial goals and create personalized budgets. Plan ahead
+                and stay on track with smart alerts and reminders.
+              </p>
+            </div>
+            <div className="card">
+              <h2>Save Smarter</h2>
+              <p>
+                Discover savings opportunities and optimize your finances.
+                Achieve your savings goals with automated tips and strategies.
+              </p>
+            </div>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }
