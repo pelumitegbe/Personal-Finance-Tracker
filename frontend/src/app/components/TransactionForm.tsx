@@ -1,11 +1,17 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface TransactionFormProps {
   onAddTransaction: (transaction: Transaction) => void;
@@ -19,13 +25,15 @@ interface Transaction {
   date: string;
 }
 
-export default function TransactionForm({ onAddTransaction }: TransactionFormProps) {
-  const [description, setDescription] = useState('')
-  const [amount, setAmount] = useState('')
-  const [type, setType] = useState('expense')
+export default function TransactionForm({
+  onAddTransaction,
+}: TransactionFormProps) {
+  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState("");
+  const [type, setType] = useState("expense");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (description && amount) {
       const transaction: Transaction = {
         id: Date.now(),
@@ -33,13 +41,13 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
         amount: parseFloat(amount),
         type,
         date: new Date().toISOString(),
-      }
-      onAddTransaction(transaction)
-      setDescription('')
-      setAmount('')
-      setType('expense')
+      };
+      onAddTransaction(transaction);
+      setDescription("");
+      setAmount("");
+      setType("expense");
     }
-  }
+  };
 
   return (
     <Card>
@@ -76,8 +84,12 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
                 <SelectValue placeholder="Select transaction type" />
               </SelectTrigger>
               <SelectContent className="z-50">
-                <SelectItem value="expense" className="text-red-500">Expense</SelectItem>
-                <SelectItem value="income" className="text-green-500">Income</SelectItem>
+                <SelectItem value="expense" className="text-red-500">
+                  Expense
+                </SelectItem>
+                <SelectItem value="income" className="text-green-500">
+                  Income
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -85,5 +97,5 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }
