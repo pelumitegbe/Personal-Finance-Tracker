@@ -45,24 +45,21 @@
   gap: 1rem;
 }
 .main-content .cards {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
   gap: 2rem;
 }
 .main-content .cards .card {
   display: flex;
   flex-direction: column;
   border-radius: 20px;
-  gap: 1rem;
+  gap: 0.7rem;
   box-shadow: 0px 17px 32px -7px #00000017;
   background: #fff;
   padding: 2rem;
-  flex-grow: 1;
-  flex-basis: 0;
   justify-content: center;
   align-items: center;
-  max-height: 200px;
+  height: 70%;
   transition: transform 0.3s ease;
 }
 .main-content .cards .card:nth-child(1):hover {
@@ -75,10 +72,9 @@
   transform: rotateX(15deg) rotateY(-15deg);
 }
 .main-content .cards .card:nth-child(2) {
-  flex-grow: 1.5;
-  min-height: 300px;
+  height: 100%;
 }
 .card h2 {
-  font-size: 24px;
   font-weight: 500;
+  line-height: 15spx;
 }
