@@ -1,14 +1,15 @@
 package controllers
 
-// not tested
-// import (
-// 	"net/http"
-// 	"github.com/gin-gonic/gin"
-// 	"project/models"  
-// )
+import (
+	"net/http"
+
+	"models"
+
+	"github.com/gin-gonic/gin"
+)
 
 func GetUser(c *gin.Context) {
-	id := c.Param("id")  // Get the user ID from the URL
+	id := c.Param("id")
 	user, found := models.GetUserByID(id)
 
 	if !found {
@@ -16,7 +17,6 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	
 	c.JSON(http.StatusOK, user)
 }
 
