@@ -13,7 +13,7 @@ import (
 
 type Transaction struct {
 	ID              uuid.UUID
-	Amount          int64
+	Amount          string
 	Description     sql.NullString
 	Category        sql.NullString
 	TransactionType string

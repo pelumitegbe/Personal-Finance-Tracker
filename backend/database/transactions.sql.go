@@ -13,16 +13,15 @@ import (
 	"github.com/google/uuid"
 )
 
-const addTransactions = `-- name: AddTransactions :one
+const addTransactions = `-- name: AddTransactions :exec
 INSERT INTO transactions (
   id,amount,transaction_type,description,category,transaction_date,created_at, updated_at
 ) VALUES ( $1,$2,$3,$4, $5,$6,$7,$8)
-RETURNING id, amount, description, category, transaction_type, transaction_date, created_at, updated_at
 `
 
 type AddTransactionsParams struct {
 	ID              uuid.UUID
-	Amount          int64
+	Amount          string
 	TransactionType string
 	Description     sql.NullString
 	Category        sql.NullString
@@ -31,8 +30,8 @@ type AddTransactionsParams struct {
 	UpdatedAt       time.Time
 }
 
-func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams) (Transaction, error) {
-	row := q.db.QueryRowContext(ctx, addTransactions,
+func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams) error {
+	_, err := q.db.ExecContext(ctx, addTransactions,
 		arg.ID,
 		arg.Amount,
 		arg.TransactionType,
@@ -42,16 +41,50 @@ func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
-	var i Transaction
-	err := row.Scan(
-		&i.ID,
-		&i.Amount,
-		&i.Description,
-		&i.Category,
-		&i.TransactionType,
-		&i.TransactionDate,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
+	return err
+}
+
+const getAllTransactions = `-- name: GetAllTransactions :many
+SELECT amount,transaction_type,description,category,transaction_date,created_at, updated_at FROM transactions
+`
+
+type GetAllTransactionsRow struct {
+	Amount          string
+	TransactionType string
+	Description     sql.NullString
+	Category        sql.NullString
+	TransactionDate time.Time
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
+func (q *Queries) GetAllTransactions(ctx context.Context) ([]GetAllTransactionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllTransactions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllTransactionsRow
+	for rows.Next() {
+		var i GetAllTransactionsRow
+		if err := rows.Scan(
+			&i.Amount,
+			&i.TransactionType,
+			&i.Description,
+			&i.Category,
+			&i.TransactionDate,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

@@ -8,5 +8,6 @@ import (
 )
 
 func UserRoutes(incomingRoutes *gin.Engine, db *database.Queries) {
-	incomingRoutes.POST("/users/addtransactions", controllers.AddTransaction(db))
+	incomingRoutes.POST("/users/transactions", controllers.AddTransaction(db))
+	incomingRoutes.GET("/users/transactions", controllers.GetTransactions(db))
 }
