@@ -78,7 +78,59 @@ func Signup(db *database.Queries) gin.HandlerFunc {
 	}
 }
 
-func Login() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+func Login(db *database.Queries) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		// getting the data from request body and validating it
+		validate := validator.New()
+		var userDetails models.User
+		if err := c.BindJSON(&userDetails); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Request body not valid"})
+			return
+		}
+		err := validate.Struct(userDetails)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Request body not valid"})
+			return
+		}
+
+		// check if user exists or not
+		userExists, err := CheckUserExists(db, userDetails.Username, userDetails.Email)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while fetching user"})
+			return
+		}
+		if !userExists {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			return
+		}
+
+		// get user
+		var user database.User
+		user, err = db.GetUserByUsernameOrEmail(ctx, database.GetUserByUsernameOrEmailParams{
+			Username: userDetails.Username,
+			Email:    userDetails.Email,
+		})
+		if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "Error while fetching user"},
+			)
+			return
+		}
+
+		// verifying if the password provided is same or not
+		err = VerifyPassword(user.Password, userDetails.Password)
+		if err != nil {
+			c.JSON(
+				http.StatusUnauthorized,
+				gin.H{"error": "Invalid credentials! username and password doesn't match"},
+			)
+			return
+		}
+
+		c.JSON(http.StatusOK, createUserResponse(user))
 	}
 }
