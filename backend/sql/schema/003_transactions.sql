@@ -3,7 +3,7 @@ CREATE TABLE transactions (
     id UUID PRIMARY KEY,
     amount NUMERIC(12, 2) NOT NULL,
     description TEXT,
-    category VARCHAR(50),
+  categories_id UUID REFERENCES category(id) NOT NULL,
     transaction_type VARCHAR(10) NOT NULL CHECK (transaction_type IN ('income', 'expense', 'transfer')),
     transaction_date DATE NOT NULL,
     created_at TIMESTAMP NOT NULL,
