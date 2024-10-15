@@ -21,6 +21,18 @@ type User struct {
 	UpdatedAt    time.Time     `json:"updated_at"`
 }
 
+type UserResponse struct {
+	ID           uuid.UUID `json:"id"`
+	Username     string    `json:"username"`
+	FirstName    string    `json:"first_name"`
+	LastName     string    `json:"last_name"`
+	Email        string    `json:"email"`
+	Token        string    `json:"token"`
+	RefreshToken string    `json:"refresh_token"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
 type Transaction struct {
 	ID              uuid.UUID `json:"id"               bson:"id"`
 	Amount          string    `json:"amount"                     validate:"required"`

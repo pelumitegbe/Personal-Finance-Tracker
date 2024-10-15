@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/pelumitegbe/Personal-Finance-Tracker/database"
+	"github.com/pelumitegbe/Personal-Finance-Tracker/models"
 )
 
 // function to hashpassword
@@ -31,6 +32,21 @@ func CheckUserExists(db *database.Queries, username string, email string) (bool,
 		return false, err
 	}
 	return exists, err
+}
+
+// create a response for user login
+func createUserResponse(user database.User) models.UserResponse {
+	return models.UserResponse{
+		ID:           user.ID,
+		Username:     user.Username,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		Email:        user.Email,
+		Token:        "",
+		RefreshToken: "",
+		CreatedAt:    user.CreatedAt,
+		UpdatedAt:    user.UpdatedAt,
+	}
 }
 
 // convert string to NullString
