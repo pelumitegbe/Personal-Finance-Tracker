@@ -43,23 +43,33 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 		}
 
 		// changing string to  null string
-		category := ToNullString(transactions.Category)
 		description := ToNullString(transactions.Description)
+
+		// getting our category id
+		category, err := db.GetCategory(ctx, transactions.Category)
+		// fmt.Print(category)
+		if err != nil {
+			c.JSON(
+				http.StatusBadRequest,
+				gin.H{"error": "Provide valid category type"},
+			)
+			return
+		}
 
 		// setting up our struct for pushing it into the database  with proper values
 		transactionData := database.AddTransactionsParams{
 			ID:              uuid.New(),
 			Amount:          transactions.Amount,
-			TransactionType: transactions.Transaction_type,
+			TransactionType: transactions.TransactionType,
 			Description:     description,
-			Category:        category,
+			CategoriesID:    category.ID,
 			TransactionDate: time.Now().Truncate(24 * time.Hour),
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 		}
 
 		// adding the transaction to the database
-		err := db.AddTransactions(ctx, transactionData)
+		err = db.AddTransactions(ctx, transactionData)
 		if err != nil {
 			c.JSON(
 				http.StatusInternalServerError,
@@ -70,6 +80,6 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 		// succesfully returning once the transaction is added to the database
-		c.JSON(http.StatusCreated, "Successfully added the transaction to the database")
+		c.JSON(http.StatusCreated, gin.H{"Success": "Transaction created successfully"})
 	}
 }
