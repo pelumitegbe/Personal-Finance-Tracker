@@ -11,7 +11,35 @@ import (
 
 	"github.com/pelumitegbe/Personal-Finance-Tracker/database"
 	"github.com/pelumitegbe/Personal-Finance-Tracker/models"
+	"github.com/pelumitegbe/Personal-Finance-Tracker/tokens"
 )
+
+func UpdateToken(
+	db *database.Queries,
+	signedToken, signedRefreshToken, userid string,
+) (database.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	id, err := uuid.Parse(userid)
+	if err != nil {
+		return database.User{}, err
+	}
+	token := ToNullString(signedToken)
+	refreshToken := ToNullString(signedRefreshToken)
+	updateTokenParams := database.UpdateUserTokensParams{
+		ID:           id,
+		Token:        token,
+		RefreshToken: refreshToken,
+		UpdatedAt:    time.Now(),
+	}
+	// update token and refresh token
+	user, err := db.UpdateUserTokens(ctx, updateTokenParams)
+	if err != nil {
+		return database.User{}, err
+	}
+	return user, nil
+}
 
 func Signup(db *database.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -54,6 +82,9 @@ func Signup(db *database.Queries) gin.HandlerFunc {
 		}
 
 		// push the user data into the database and create user
+		if user.Role == "" {
+			user.Role = "user"
+		}
 		userParams := database.CreateUserParams{
 			ID:        uuid.New(),
 			Username:  user.Username,
@@ -61,10 +92,12 @@ func Signup(db *database.Queries) gin.HandlerFunc {
 			Password:  hashedPassword,
 			FirstName: user.FirstName,
 			LastName:  user.LastName,
+			Role:      user.Role,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}
 
+		// store the user information in the database
 		err = db.CreateUser(ctx, userParams)
 		if err != nil {
 			c.JSON(
@@ -74,7 +107,35 @@ func Signup(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, gin.H{"Success": "User created successfully"})
+		// generate jwt token
+		token, refresh_token, err := tokens.TokenGenerator(
+			userParams.Email,
+			userParams.FirstName,
+			userParams.LastName,
+			userParams.Username,
+			userParams.ID.String(),
+			userParams.Role,
+		)
+		if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "Couldn't create the user. Error while creating the user"},
+			)
+			return
+		}
+
+		// save the token in the database
+		newUser, err := UpdateToken(db, token, refresh_token, userParams.ID.String())
+		if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "Couldn't create the user. Error while creating the user"},
+			)
+			return
+		}
+
+		// user successfully created and return the response
+		c.JSON(http.StatusCreated, createUserResponse(newUser))
 	}
 }
 
@@ -131,6 +192,34 @@ func Login(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, createUserResponse(user))
+		// generating access token and refresh token
+		token, refresh_token, err := tokens.TokenGenerator(
+			user.Email,
+			user.FirstName,
+			user.LastName,
+			user.Username,
+			user.ID.String(),
+			user.Role,
+		)
+		if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "Couldn't create the user. Error while creating the user"},
+			)
+			return
+		}
+
+		// updating the token to the database
+		newUser, err := UpdateToken(db, token, refresh_token, user.ID.String())
+		if err != nil {
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "Couldn't create the user. Error while creating the user"},
+			)
+			return
+		}
+
+		// reponse
+		c.JSON(http.StatusOK, createUserResponse(newUser))
 	}
 }
