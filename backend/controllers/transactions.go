@@ -31,7 +31,7 @@ func GetTransactions(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, transactions)
+		c.JSON(http.StatusOK, createTransactionsResponse(transactions))
 	}
 }
 
@@ -84,7 +84,7 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 		}
 
 		// adding the transaction to the database
-		err = db.AddTransactions(ctx, transactionData)
+		transaction, err := db.AddTransactions(ctx, transactionData)
 		if err != nil {
 			c.JSON(
 				http.StatusInternalServerError,
@@ -95,7 +95,7 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 		// succesfully returning once the transaction is added to the database
-		c.JSON(http.StatusCreated, gin.H{"Success": "Transaction created successfully"})
+		c.JSON(http.StatusCreated, createTransactionsResponse(transaction))
 	}
 }
 

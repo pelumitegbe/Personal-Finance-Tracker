@@ -35,6 +35,11 @@ type UserResponse struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
+type TransactionResponse struct {
+	Status string      `json:"status"`
+	Data   interface{} `json:"data"`
+}
+
 type Transaction struct {
 	ID              uuid.UUID `json:"id"               bson:"id"`
 	Amount          string    `json:"amount"                     validate:"required"`
