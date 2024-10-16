@@ -47,12 +47,41 @@ func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams
 	return err
 }
 
+const deleteTransactionById = `-- name: DeleteTransactionById :one
+DELETE FROM transactions
+WHERE id =$1 and user_id = $2
+RETURNING id, amount, description, categories_id, user_id, transaction_type, transaction_date, created_at, updated_at
+`
+
+type DeleteTransactionByIdParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) DeleteTransactionById(ctx context.Context, arg DeleteTransactionByIdParams) (Transaction, error) {
+	row := q.db.QueryRowContext(ctx, deleteTransactionById, arg.ID, arg.UserID)
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.Amount,
+		&i.Description,
+		&i.CategoriesID,
+		&i.UserID,
+		&i.TransactionType,
+		&i.TransactionDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getAllTransactions = `-- name: GetAllTransactions :many
-SELECT amount,transaction_type,description,categories_id,transaction_date,created_at, updated_at FROM transactions
-where user_id = $1
+SELECT id, amount,transaction_type,description,categories_id,transaction_date,created_at, updated_at FROM transactions
+WHERE user_id = $1
 `
 
 type GetAllTransactionsRow struct {
+	ID              uuid.UUID      `json:"id"`
 	Amount          string         `json:"amount"`
 	TransactionType string         `json:"transaction_type"`
 	Description     sql.NullString `json:"description"`
@@ -72,6 +101,7 @@ func (q *Queries) GetAllTransactions(ctx context.Context, userID uuid.UUID) ([]G
 	for rows.Next() {
 		var i GetAllTransactionsRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Amount,
 			&i.TransactionType,
 			&i.Description,

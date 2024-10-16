@@ -5,5 +5,10 @@ INSERT INTO transactions (
 RETURNING *;
 
 -- name: GetAllTransactions :many
-SELECT amount,transaction_type,description,categories_id,transaction_date,created_at, updated_at FROM transactions
-where user_id = $1;
+SELECT id, amount,transaction_type,description,categories_id,transaction_date,created_at, updated_at FROM transactions
+WHERE user_id = $1;
+
+-- name: DeleteTransactionById :one
+DELETE FROM transactions
+WHERE id =$1 and user_id = $2
+RETURNING *;
