@@ -15,10 +15,16 @@ import (
 // handler for getting all the transactions
 func GetTransactions(db *database.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		transactions, err := db.GetAllTransactions(ctx)
+		uid, msg := getUserIdFromRequest(c)
+		if msg != "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
+
+		transactions, err := db.GetAllTransactions(ctx, uid)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve transactions"})
 			return
@@ -32,13 +38,20 @@ func GetTransactions(db *database.Queries) gin.HandlerFunc {
 func AddTransaction(db *database.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// creating a context so that the request will timeout after certain time
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
 		// creating a transaction variable
 		var transactions models.Transaction
 		if err := c.BindJSON(&transactions); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Request body not valid"})
+			return
+		}
+
+		// getting the user id from the request
+		user_id, msg := getUserIdFromRequest(c)
+		if msg != "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
 			return
 		}
 
@@ -63,6 +76,7 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 			TransactionType: transactions.TransactionType,
 			Description:     description,
 			CategoriesID:    category.ID,
+			UserID:          user_id,
 			TransactionDate: time.Now().Truncate(24 * time.Hour),
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),

@@ -16,6 +16,7 @@ type User struct {
 	Phone        int64         `json:"phone"`
 	Token        string        `json:"token"`
 	RefreshToken string        `json:"refresh_token"`
+	Role         string        `json:"role"`
 	Transactions []Transaction `json:"transactions"`
 	CreatedAt    time.Time     `json:"created_at"`
 	UpdatedAt    time.Time     `json:"updated_at"`
@@ -27,6 +28,7 @@ type UserResponse struct {
 	FirstName    string    `json:"first_name"`
 	LastName     string    `json:"last_name"`
 	Email        string    `json:"email"`
+	Role         string    `json:"role"`
 	Token        string    `json:"token"`
 	RefreshToken string    `json:"refresh_token"`
 	CreatedAt    time.Time `json:"created_at"`

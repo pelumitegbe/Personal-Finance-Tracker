@@ -15,9 +15,9 @@ import (
 
 const addTransactions = `-- name: AddTransactions :exec
 INSERT INTO transactions (
-  id,amount,description,transaction_type,categories_id,transaction_date,created_at, updated_at
-) VALUES ( $1,$2,$3,$4, $5,$6,$7,$8)
-RETURNING id, amount, description, categories_id, transaction_type, transaction_date, created_at, updated_at
+  id,amount,description,transaction_type,categories_id,user_id,transaction_date,created_at, updated_at
+) VALUES ( $1,$2,$3,$4, $5,$6,$7,$8,$9)
+RETURNING id, amount, description, categories_id, user_id, transaction_type, transaction_date, created_at, updated_at
 `
 
 type AddTransactionsParams struct {
@@ -26,6 +26,7 @@ type AddTransactionsParams struct {
 	Description     sql.NullString `json:"description"`
 	TransactionType string         `json:"transaction_type"`
 	CategoriesID    uuid.UUID      `json:"categories_id"`
+	UserID          uuid.UUID      `json:"user_id"`
 	TransactionDate time.Time      `json:"transaction_date"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
@@ -38,6 +39,7 @@ func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams
 		arg.Description,
 		arg.TransactionType,
 		arg.CategoriesID,
+		arg.UserID,
 		arg.TransactionDate,
 		arg.CreatedAt,
 		arg.UpdatedAt,
@@ -47,6 +49,7 @@ func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams
 
 const getAllTransactions = `-- name: GetAllTransactions :many
 SELECT amount,transaction_type,description,categories_id,transaction_date,created_at, updated_at FROM transactions
+where user_id = $1
 `
 
 type GetAllTransactionsRow struct {
@@ -59,8 +62,8 @@ type GetAllTransactionsRow struct {
 	UpdatedAt       time.Time      `json:"updated_at"`
 }
 
-func (q *Queries) GetAllTransactions(ctx context.Context) ([]GetAllTransactionsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getAllTransactions)
+func (q *Queries) GetAllTransactions(ctx context.Context, userID uuid.UUID) ([]GetAllTransactionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllTransactions, userID)
 	if err != nil {
 		return nil, err
 	}

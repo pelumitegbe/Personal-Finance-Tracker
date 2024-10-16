@@ -22,6 +22,7 @@ type Transaction struct {
 	Amount          string         `json:"amount"`
 	Description     sql.NullString `json:"description"`
 	CategoriesID    uuid.UUID      `json:"categories_id"`
+	UserID          uuid.UUID      `json:"user_id"`
 	TransactionType string         `json:"transaction_type"`
 	TransactionDate time.Time      `json:"transaction_date"`
 	CreatedAt       time.Time      `json:"created_at"`
@@ -29,12 +30,15 @@ type Transaction struct {
 }
 
 type User struct {
-	ID        uuid.UUID `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID           uuid.UUID      `json:"id"`
+	Username     string         `json:"username"`
+	Email        string         `json:"email"`
+	Password     string         `json:"password"`
+	FirstName    string         `json:"first_name"`
+	LastName     string         `json:"last_name"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	Token        sql.NullString `json:"token"`
+	RefreshToken sql.NullString `json:"refresh_token"`
+	Role         string         `json:"role"`
 }

@@ -4,11 +4,38 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/pelumitegbe/Personal-Finance-Tracker/database"
 	"github.com/pelumitegbe/Personal-Finance-Tracker/models"
 )
+
+func getUserIdFromRequest(c *gin.Context) (uuid.UUID, string) {
+	var msg string
+	// get user id
+	uid, exists := c.Get("uid")
+	if !exists || uid == "" {
+		msg = "User Id not found"
+		return uuid.UUID{}, msg
+	}
+
+	// Type assert uid to a string
+	userIdStr, ok := uid.(string)
+	if !ok {
+		msg = "Invalid user id"
+		return uuid.UUID{}, msg
+	}
+
+	// parse user id into uuid
+	user_id, err := uuid.Parse(userIdStr)
+	if err != nil {
+		msg = "Internal server error"
+		return uuid.UUID{}, msg
+	}
+	return user_id, ""
+}
 
 // function to hashpassword
 func HashPassword(password string) (string, error) {
@@ -35,17 +62,21 @@ func CheckUserExists(db *database.Queries, username string, email string) (bool,
 }
 
 // create a response for user login
-func createUserResponse(user database.User) models.UserResponse {
-	return models.UserResponse{
-		ID:           user.ID,
-		Username:     user.Username,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-		Email:        user.Email,
-		Token:        "",
-		RefreshToken: "",
-		CreatedAt:    user.CreatedAt,
-		UpdatedAt:    user.UpdatedAt,
+func createUserResponse(user database.User) any {
+	return map[string]interface{}{
+		"status": "success",
+		"user": models.UserResponse{
+			ID:           user.ID,
+			Username:     user.Username,
+			FirstName:    user.FirstName,
+			LastName:     user.LastName,
+			Email:        user.Email,
+			Role:         user.Role,
+			Token:        user.Token.String,
+			RefreshToken: user.RefreshToken.String,
+			CreatedAt:    user.CreatedAt,
+			UpdatedAt:    user.UpdatedAt,
+		},
 	}
 }
 

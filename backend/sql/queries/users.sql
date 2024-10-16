@@ -1,7 +1,7 @@
 -- name: CreateUser :exec
 INSERT INTO users (
-  id,username,email,password,first_name,last_name,created_at,updated_at
-) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) 
+  id,username,email,password,first_name,last_name,role,created_at,updated_at
+) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) 
 RETURNING *;
 
 -- name: GetUserByEmail :one
@@ -20,3 +20,8 @@ SELECT EXISTS (
     WHERE email = $1 OR username = $2
 );
 
+-- name: UpdateUserTokens :one
+UPDATE users
+  SET token = $2, refresh_token= $3, updated_at = $4
+  WHERE id = $1
+RETURNING *;
