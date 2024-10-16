@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const addTransactions = `-- name: AddTransactions :exec
+const addTransactions = `-- name: AddTransactions :one
 INSERT INTO transactions (
   id,amount,description,transaction_type,categories_id,user_id,transaction_date,created_at, updated_at
 ) VALUES ( $1,$2,$3,$4, $5,$6,$7,$8,$9)
@@ -32,8 +32,8 @@ type AddTransactionsParams struct {
 	UpdatedAt       time.Time      `json:"updated_at"`
 }
 
-func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams) error {
-	_, err := q.db.ExecContext(ctx, addTransactions,
+func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams) (Transaction, error) {
+	row := q.db.QueryRowContext(ctx, addTransactions,
 		arg.ID,
 		arg.Amount,
 		arg.Description,
@@ -44,19 +44,61 @@ func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
-	return err
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.Amount,
+		&i.Description,
+		&i.CategoriesID,
+		&i.UserID,
+		&i.TransactionType,
+		&i.TransactionDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const deleteTransactionById = `-- name: DeleteTransactionById :one
+DELETE FROM transactions
+WHERE id =$1 and user_id = $2
+RETURNING id, amount, description, categories_id, user_id, transaction_type, transaction_date, created_at, updated_at
+`
+
+type DeleteTransactionByIdParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) DeleteTransactionById(ctx context.Context, arg DeleteTransactionByIdParams) (Transaction, error) {
+	row := q.db.QueryRowContext(ctx, deleteTransactionById, arg.ID, arg.UserID)
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.Amount,
+		&i.Description,
+		&i.CategoriesID,
+		&i.UserID,
+		&i.TransactionType,
+		&i.TransactionDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const getAllTransactions = `-- name: GetAllTransactions :many
-SELECT amount,transaction_type,description,categories_id,transaction_date,created_at, updated_at FROM transactions
-where user_id = $1
+SELECT id, amount,transaction_type,description,categories_id,user_id,transaction_date,created_at, updated_at FROM transactions
+WHERE user_id = $1
 `
 
 type GetAllTransactionsRow struct {
+	ID              uuid.UUID      `json:"id"`
 	Amount          string         `json:"amount"`
 	TransactionType string         `json:"transaction_type"`
 	Description     sql.NullString `json:"description"`
 	CategoriesID    uuid.UUID      `json:"categories_id"`
+	UserID          uuid.UUID      `json:"user_id"`
 	TransactionDate time.Time      `json:"transaction_date"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
@@ -72,10 +114,12 @@ func (q *Queries) GetAllTransactions(ctx context.Context, userID uuid.UUID) ([]G
 	for rows.Next() {
 		var i GetAllTransactionsRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Amount,
 			&i.TransactionType,
 			&i.Description,
 			&i.CategoriesID,
+			&i.UserID,
 			&i.TransactionDate,
 			&i.CreatedAt,
 			&i.UpdatedAt,

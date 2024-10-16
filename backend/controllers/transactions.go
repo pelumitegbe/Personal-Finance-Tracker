@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"time"
 
@@ -30,7 +31,7 @@ func GetTransactions(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, transactions)
+		c.JSON(http.StatusOK, createTransactionsResponse(transactions))
 	}
 }
 
@@ -83,7 +84,7 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 		}
 
 		// adding the transaction to the database
-		err = db.AddTransactions(ctx, transactionData)
+		transaction, err := db.AddTransactions(ctx, transactionData)
 		if err != nil {
 			c.JSON(
 				http.StatusInternalServerError,
@@ -94,6 +95,55 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 		// succesfully returning once the transaction is added to the database
-		c.JSON(http.StatusCreated, gin.H{"Success": "Transaction created successfully"})
+		c.JSON(http.StatusCreated, createTransactionsResponse(transaction))
+	}
+}
+
+// function to delete transaction of a user
+func DeleteTransactions(db *database.Queries) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+		defer cancel()
+
+		// getting transasctions id from the url
+		id := c.Param("id")
+		transaction_id, err := uuid.Parse(id)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user id "})
+			return
+		}
+		// getting the user id from the request
+		user_id, msg := getUserIdFromRequest(c)
+		if msg != "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
+
+		// deleting transaction from the database
+		_, err = db.DeleteTransactionById(
+			ctx,
+			database.DeleteTransactionByIdParams{
+				ID:     transaction_id,
+				UserID: user_id,
+			},
+		)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(
+					http.StatusNotFound,
+					gin.H{
+						"error": "Couldn't find any transactions of the user with provided transactions id",
+					},
+				)
+				return
+			}
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "Couldn't delete the transaction please try again"},
+			)
+			return
+		}
+
+		c.JSON(http.StatusNoContent, nil)
 	}
 }

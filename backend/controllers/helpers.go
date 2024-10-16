@@ -80,6 +80,14 @@ func createUserResponse(user database.User) any {
 	}
 }
 
+// create a response for the transactions
+func createTransactionsResponse(data interface{}) models.TransactionResponse {
+	return models.TransactionResponse{
+		Status: "Success",
+		Data:   data,
+	}
+}
+
 // convert string to NullString
 func ToNullString(s string) sql.NullString {
 	if s == "" {
