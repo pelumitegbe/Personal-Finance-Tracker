@@ -33,3 +33,16 @@ export interface IDecodedUser {
   fullname?: string;
 }
 
+export interface LoginProps {
+  username: string;
+  password: string;
+}
+
+export interface RegisterProps {
+  username: string;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+}
+

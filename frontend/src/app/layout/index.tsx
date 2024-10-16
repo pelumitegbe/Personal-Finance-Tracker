@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { ToastContainer } from "react-toastify";
+// import { ToastContainer } from "react-toastify";
 // import { Header, Navigation } from "../components";
 import { AuthContext } from "../context";
 import { LayoutProps, userProps } from "../interface";
@@ -34,7 +34,7 @@ const Layout = ({ children, name, pageTitle }: LayoutProps) => {
         className="contentsRight"
         style={{ display: "flex", flexDirection: "column", flex: "0.91" }}
       >
-        <ToastContainer />
+        {/* <ToastContainer /> */}
         <Header title={pageTitle} user={user || defaultUser} />
         <div className={"contents"}>{children}</div>
       </div>

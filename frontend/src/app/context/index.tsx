@@ -1,3 +1,4 @@
+"use client";
 import { createContext, useEffect, useState } from "react";
 import { queryKeys } from "../react-query/constants";
 import { getLoginToken, getStoredUser, setStoredUser } from "../storage";

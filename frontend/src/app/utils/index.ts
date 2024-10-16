@@ -48,7 +48,7 @@ export const successAlert = (msg: string) => {
 export type ErrorResponse = {
   response?: {
     data?: {
-      message?: string;
+      Error?: string;
       msg?: string;
       error?: string;
     };
@@ -57,15 +57,15 @@ export type ErrorResponse = {
 
 export const errorAlert = (error : ErrorResponse) => {
   const err =
-    error?.response?.data?.message ||
+    error?.response?.data?.Error ||
     error?.response?.data?.msg ||
     error?.response?.data?.error
-      ? error?.response?.data?.message ||
+      ? error?.response?.data?.Error ||
         error?.response?.data?.msg ||
         error?.response?.data?.error
       : SERVER_ERROR;
-  return err;
-  //   toast.error(err, toastOptions);
+  toast.error(err, toastOptions);
+  // return err;
 };
 export const infoAlert = (msg: string) => {
   toast.info(msg || "Info Notification !", toastOptions);

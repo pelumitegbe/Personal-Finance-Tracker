@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -43,6 +44,17 @@ func main() {
 	// initializing our router
 	router := gin.New()
 	router.Use(gin.Logger())
+
+	// Custom CORS configuration to allow requests from frontend
+	corsConfig := cors.Config{
+		AllowAllOrigins:  true,
+		// AllowOrigins:     []string{"http://localhost:3000"}, // Allow only frontend origin
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Allowed methods
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // Allowed headers
+		ExposeHeaders:    []string{"Content-Length"}, // Expose specific headers
+		AllowCredentials: true, // Allow credentials like cookies
+	}
+	router.Use(cors.New(corsConfig))
 
 	routes.UserRoutes(router, db)
 
