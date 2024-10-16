@@ -81,6 +81,7 @@ backend/
 4. Run the database migrations
 
    ```sh
+   cd sql/schema
    goose postgres postgresql://admin:finance123@localhost:5433/finance_tracker up
    ```
 
@@ -164,6 +165,17 @@ Adds the transactions to the database .
 - **URL:** `/users/transactions`
 - **Method:** `POST`
 - **Auth required:** No (Not right now but will require later)
+- **Sample request body:**
+
+```json
+{
+  "amount": "100.76",
+  "currency": "USD",
+  "transaction_type": "income",
+  "category": "subscription",
+  "description": "netflix subscription"
+}
+```
 
 #### Success Response
 

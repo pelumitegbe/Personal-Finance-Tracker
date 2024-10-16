@@ -15,10 +15,16 @@ import (
 // handler for getting all the transactions
 func GetTransactions(db *database.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		transactions, err := db.GetAllTransactions(ctx)
+		uid, msg := getUserIdFromRequest(c)
+		if msg != "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
+
+		transactions, err := db.GetAllTransactions(ctx, uid)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve transactions"})
 			return
@@ -32,7 +38,7 @@ func GetTransactions(db *database.Queries) gin.HandlerFunc {
 func AddTransaction(db *database.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// creating a context so that the request will timeout after certain time
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
 		// creating a transaction variable
@@ -42,24 +48,42 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 
+		// getting the user id from the request
+		user_id, msg := getUserIdFromRequest(c)
+		if msg != "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
+
 		// changing string to  null string
-		category := ToNullString(transactions.Category)
 		description := ToNullString(transactions.Description)
+
+		// getting our category id
+		category, err := db.GetCategory(ctx, transactions.Category)
+		// fmt.Print(category)
+		if err != nil {
+			c.JSON(
+				http.StatusBadRequest,
+				gin.H{"error": "Provide valid category type"},
+			)
+			return
+		}
 
 		// setting up our struct for pushing it into the database  with proper values
 		transactionData := database.AddTransactionsParams{
 			ID:              uuid.New(),
 			Amount:          transactions.Amount,
-			TransactionType: transactions.Transaction_type,
+			TransactionType: transactions.TransactionType,
 			Description:     description,
-			Category:        category,
+			CategoriesID:    category.ID,
+			UserID:          user_id,
 			TransactionDate: time.Now().Truncate(24 * time.Hour),
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 		}
 
 		// adding the transaction to the database
-		err := db.AddTransactions(ctx, transactionData)
+		err = db.AddTransactions(ctx, transactionData)
 		if err != nil {
 			c.JSON(
 				http.StatusInternalServerError,
@@ -70,6 +94,6 @@ func AddTransaction(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 		// succesfully returning once the transaction is added to the database
-		c.JSON(http.StatusCreated, "Successfully added the transaction to the database")
+		c.JSON(http.StatusCreated, gin.H{"Success": "Transaction created successfully"})
 	}
 }

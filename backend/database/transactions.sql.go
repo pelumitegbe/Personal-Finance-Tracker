@@ -15,28 +15,31 @@ import (
 
 const addTransactions = `-- name: AddTransactions :exec
 INSERT INTO transactions (
-  id,amount,transaction_type,description,category,transaction_date,created_at, updated_at
-) VALUES ( $1,$2,$3,$4, $5,$6,$7,$8)
+  id,amount,description,transaction_type,categories_id,user_id,transaction_date,created_at, updated_at
+) VALUES ( $1,$2,$3,$4, $5,$6,$7,$8,$9)
+RETURNING id, amount, description, categories_id, user_id, transaction_type, transaction_date, created_at, updated_at
 `
 
 type AddTransactionsParams struct {
-	ID              uuid.UUID
-	Amount          string
-	TransactionType string
-	Description     sql.NullString
-	Category        sql.NullString
-	TransactionDate time.Time
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	ID              uuid.UUID      `json:"id"`
+	Amount          string         `json:"amount"`
+	Description     sql.NullString `json:"description"`
+	TransactionType string         `json:"transaction_type"`
+	CategoriesID    uuid.UUID      `json:"categories_id"`
+	UserID          uuid.UUID      `json:"user_id"`
+	TransactionDate time.Time      `json:"transaction_date"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
 }
 
 func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams) error {
 	_, err := q.db.ExecContext(ctx, addTransactions,
 		arg.ID,
 		arg.Amount,
-		arg.TransactionType,
 		arg.Description,
-		arg.Category,
+		arg.TransactionType,
+		arg.CategoriesID,
+		arg.UserID,
 		arg.TransactionDate,
 		arg.CreatedAt,
 		arg.UpdatedAt,
@@ -45,21 +48,22 @@ func (q *Queries) AddTransactions(ctx context.Context, arg AddTransactionsParams
 }
 
 const getAllTransactions = `-- name: GetAllTransactions :many
-SELECT amount,transaction_type,description,category,transaction_date,created_at, updated_at FROM transactions
+SELECT amount,transaction_type,description,categories_id,transaction_date,created_at, updated_at FROM transactions
+where user_id = $1
 `
 
 type GetAllTransactionsRow struct {
-	Amount          string
-	TransactionType string
-	Description     sql.NullString
-	Category        sql.NullString
-	TransactionDate time.Time
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	Amount          string         `json:"amount"`
+	TransactionType string         `json:"transaction_type"`
+	Description     sql.NullString `json:"description"`
+	CategoriesID    uuid.UUID      `json:"categories_id"`
+	TransactionDate time.Time      `json:"transaction_date"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
 }
 
-func (q *Queries) GetAllTransactions(ctx context.Context) ([]GetAllTransactionsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getAllTransactions)
+func (q *Queries) GetAllTransactions(ctx context.Context, userID uuid.UUID) ([]GetAllTransactionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllTransactions, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +75,7 @@ func (q *Queries) GetAllTransactions(ctx context.Context) ([]GetAllTransactionsR
 			&i.Amount,
 			&i.TransactionType,
 			&i.Description,
-			&i.Category,
+			&i.CategoriesID,
 			&i.TransactionDate,
 			&i.CreatedAt,
 			&i.UpdatedAt,
