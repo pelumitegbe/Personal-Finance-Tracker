@@ -1,0 +1,22 @@
+version: "3"
+services:
+  db:
+    image: postgres:14
+    container_name: finance_tracker_db
+    restart: always
+    environment:
+      POSTGRES_DB: finance_tracker
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: finance123
+
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # below option is to run in interactive terminal mode, we don't need it to run in detached mode, remove it in
+    # production
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
