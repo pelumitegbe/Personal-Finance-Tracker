@@ -11,13 +11,30 @@ import (
 	"github.com/google/uuid"
 )
 
+type Category struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type Transaction struct {
-	ID              uuid.UUID
-	Amount          string
-	Description     sql.NullString
-	Category        sql.NullString
-	TransactionType string
-	TransactionDate time.Time
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	ID              uuid.UUID      `json:"id"`
+	Amount          string         `json:"amount"`
+	Description     sql.NullString `json:"description"`
+	CategoriesID    uuid.UUID      `json:"categories_id"`
+	TransactionType string         `json:"transaction_type"`
+	TransactionDate time.Time      `json:"transaction_date"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
+}
+
+type User struct {
+	ID        uuid.UUID `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
