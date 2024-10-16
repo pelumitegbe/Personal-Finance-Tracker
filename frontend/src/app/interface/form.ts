@@ -15,7 +15,7 @@ export interface InputProps {
   style?: object;
   type?: string;
   validationHandler: (name: string, error: string) => void;
-  value: any;
+  value: unknown;
   labelDisplayed: boolean;
   size?: string;
   labelClassName?: string;
@@ -66,7 +66,7 @@ export interface StoreButtonProps {
 }
 
 export interface FormData {
-  [key: string]: string | boolean | { required?: boolean; value: any };
+  [key: string]: string | boolean | { required?: boolean; value: unknown };
 }
 export interface Errors {
   [key: string]: string;
@@ -127,7 +127,7 @@ export interface SelectProps {
   style?: object;
   data: string[];
   validationHandler: (name: string, error: string) => void;
-  value: any;
+  value: unknown;
   size: string;
   labelClassName?: string;
   title: string;
@@ -147,4 +147,8 @@ export interface TextareaProps {
   value: string;
   size?: string;
   labelClassName?: string;
+}
+
+export interface LoginFormProps {
+  setIsLogin: (isLogin: boolean) => void;
 }
