@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,9 +34,9 @@ func (q *Queries) CheckUserExists(ctx context.Context, arg CheckUserExistsParams
 
 const createUser = `-- name: CreateUser :exec
 INSERT INTO users (
-  id,username,email,password,first_name,last_name,created_at,updated_at
-) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) 
-RETURNING id, username, email, password, first_name, last_name, created_at, updated_at
+  id,username,email,password,first_name,last_name,role,created_at,updated_at
+) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) 
+RETURNING id, username, email, password, first_name, last_name, created_at, updated_at, token, refresh_token, role
 `
 
 type CreateUserParams struct {
@@ -45,6 +46,7 @@ type CreateUserParams struct {
 	Password  string    `json:"password"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
+	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -57,6 +59,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 		arg.Password,
 		arg.FirstName,
 		arg.LastName,
+		arg.Role,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
@@ -64,7 +67,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, username, email, password, first_name, last_name, created_at, updated_at FROM users WHERE email = $1
+SELECT id, username, email, password, first_name, last_name, created_at, updated_at, token, refresh_token, role FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -79,12 +82,15 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.LastName,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Token,
+		&i.RefreshToken,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, email, password, first_name, last_name, created_at, updated_at FROM users WHERE username = $1
+SELECT id, username, email, password, first_name, last_name, created_at, updated_at, token, refresh_token, role FROM users WHERE username = $1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
@@ -99,12 +105,15 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.LastName,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Token,
+		&i.RefreshToken,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUserByUsernameOrEmail = `-- name: GetUserByUsernameOrEmail :one
-SELECT id, username, email, password, first_name, last_name, created_at, updated_at FROM users WHERE username = $1 OR email = $2
+SELECT id, username, email, password, first_name, last_name, created_at, updated_at, token, refresh_token, role FROM users WHERE username = $1 OR email = $2
 `
 
 type GetUserByUsernameOrEmailParams struct {
@@ -124,6 +133,47 @@ func (q *Queries) GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUse
 		&i.LastName,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Token,
+		&i.RefreshToken,
+		&i.Role,
+	)
+	return i, err
+}
+
+const updateUserTokens = `-- name: UpdateUserTokens :one
+UPDATE users
+  SET token = $2, refresh_token= $3, updated_at = $4
+  WHERE id = $1
+RETURNING id, username, email, password, first_name, last_name, created_at, updated_at, token, refresh_token, role
+`
+
+type UpdateUserTokensParams struct {
+	ID           uuid.UUID      `json:"id"`
+	Token        sql.NullString `json:"token"`
+	RefreshToken sql.NullString `json:"refresh_token"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+}
+
+func (q *Queries) UpdateUserTokens(ctx context.Context, arg UpdateUserTokensParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserTokens,
+		arg.ID,
+		arg.Token,
+		arg.RefreshToken,
+		arg.UpdatedAt,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.Password,
+		&i.FirstName,
+		&i.LastName,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Token,
+		&i.RefreshToken,
+		&i.Role,
 	)
 	return i, err
 }

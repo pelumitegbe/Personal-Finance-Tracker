@@ -35,17 +35,21 @@ func CheckUserExists(db *database.Queries, username string, email string) (bool,
 }
 
 // create a response for user login
-func createUserResponse(user database.User) models.UserResponse {
-	return models.UserResponse{
-		ID:           user.ID,
-		Username:     user.Username,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-		Email:        user.Email,
-		Token:        "",
-		RefreshToken: "",
-		CreatedAt:    user.CreatedAt,
-		UpdatedAt:    user.UpdatedAt,
+func createUserResponse(user database.User) any {
+	return map[string]interface{}{
+		"status": "success",
+		"user": models.UserResponse{
+			ID:           user.ID,
+			Username:     user.Username,
+			FirstName:    user.FirstName,
+			LastName:     user.LastName,
+			Email:        user.Email,
+			Role:         user.Role,
+			Token:        user.Token.String,
+			RefreshToken: user.RefreshToken.String,
+			CreatedAt:    user.CreatedAt,
+			UpdatedAt:    user.UpdatedAt,
+		},
 	}
 }
 
