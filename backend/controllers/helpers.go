@@ -4,11 +4,38 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/pelumitegbe/Personal-Finance-Tracker/database"
 	"github.com/pelumitegbe/Personal-Finance-Tracker/models"
 )
+
+func getUserIdFromRequest(c *gin.Context) (uuid.UUID, string) {
+	var msg string
+	// get user id
+	uid, exists := c.Get("uid")
+	if !exists || uid == "" {
+		msg = "User Id not found"
+		return uuid.UUID{}, msg
+	}
+
+	// Type assert uid to a string
+	userIdStr, ok := uid.(string)
+	if !ok {
+		msg = "Invalid user id"
+		return uuid.UUID{}, msg
+	}
+
+	// parse user id into uuid
+	user_id, err := uuid.Parse(userIdStr)
+	if err != nil {
+		msg = "Internal server error"
+		return uuid.UUID{}, msg
+	}
+	return user_id, ""
+}
 
 // function to hashpassword
 func HashPassword(password string) (string, error) {

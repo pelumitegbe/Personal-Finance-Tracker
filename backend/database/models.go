@@ -22,6 +22,7 @@ type Transaction struct {
 	Amount          string         `json:"amount"`
 	Description     sql.NullString `json:"description"`
 	CategoriesID    uuid.UUID      `json:"categories_id"`
+	UserID          uuid.UUID      `json:"user_id"`
 	TransactionType string         `json:"transaction_type"`
 	TransactionDate time.Time      `json:"transaction_date"`
 	CreatedAt       time.Time      `json:"created_at"`
