@@ -1,10 +1,11 @@
 import { axiosInstance } from "../../axios-Instance";
-import { errorAlert, ErrorResponse } from "../../utils";
+import { errorAlert, ErrorResponse, successAlert } from "../../utils";
 import { useContext } from "react";
 import { AuthContext } from "../../context";
 import { setLoginToken } from "../../storage";
 import { useMutation } from "@tanstack/react-query";
 import { LoginProps, RegisterProps } from "../../interface";
+import { useRouter } from "next/navigation";
 
 async function userLogin(formData: LoginProps) {
   const data = await axiosInstance({
@@ -15,8 +16,6 @@ async function userLogin(formData: LoginProps) {
       "Content-Type": "application/json",
     },
   });
-
-  console.log(data?.data)
 
   return data?.data;
 }
@@ -40,11 +39,14 @@ async function userRegister(formData: RegisterProps) {
 
 export function useLogin() {
   const authCtx = useContext(AuthContext);
+  const router = useRouter();
   const { mutate, isError, error, isSuccess, reset } = useMutation({
     mutationFn: (formData: LoginProps) => userLogin(formData),
     onSuccess: (data) => {
       setLoginToken(data.token);
-      authCtx.authenticate(data.token);
+      authCtx.authenticate(data);
+      successAlert("Logged in successfully");
+      router.push("/dashboard");
     },
     onError: (error: ErrorResponse) => {
       errorAlert(error);

@@ -7,7 +7,7 @@ import picture from "../../assets/avatar.png";
 
 interface headerProp {
   title: string;
-  user: userProps;
+  user: userProps | undefined;
 }
 const Header = ({ title, user }: headerProp) => {
   const [search, setSearch] = useState("");
@@ -16,7 +16,7 @@ const Header = ({ title, user }: headerProp) => {
       <div className={header.titleCon}>
         <div className={header.greeting}>
           <p className={header.greetingText}>
-            Hello {user?.firstname}, how is it going?
+            Hello {user?.first_name}, how is it going?
           </p>
         </div>
         <div className={header.title}>{title}</div>
@@ -34,7 +34,9 @@ const Header = ({ title, user }: headerProp) => {
       </div>
       <div className={header.adminNav}>
         <Image src={picture} alt="Avatar" className={header.adminImg} />
-        <h4 className={header.name}>{user?.fullname} </h4>
+        <h4 className={header.name}>
+          {user?.first_name} {user?.last_name}
+        </h4>
       </div>
     </div>
   );

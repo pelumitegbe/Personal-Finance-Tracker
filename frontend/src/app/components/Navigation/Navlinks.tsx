@@ -1,6 +1,5 @@
 import React, { Fragment, useContext } from "react";
 import { FaSignOutAlt } from "react-icons/fa";
-// import { useRouter } from "next/router";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "../../context";
 import { adminLinks } from "./link";

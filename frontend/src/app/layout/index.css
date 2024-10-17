@@ -1,0 +1,17 @@
+.appContainer {
+  display: flex;
+  flex: 1;
+  height: 100vh;
+  background: white;
+  justify-content: space-around;
+}
+
+.contentsRight {
+  flex-grow: 1;
+  padding: 0;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  flex: 0.95;
+  padding: 0.5rem 1rem;
+}
