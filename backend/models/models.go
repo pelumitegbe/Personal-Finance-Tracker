@@ -57,3 +57,11 @@ type Category struct {
 	Name       string    `json:"name"`
 	Created_At time.Time `json:"created_at"`
 }
+
+type Balance struct {
+	ID           uuid.UUID `json:"id"`
+	UserID       uuid.UUID `json:"user_id"`
+	CurrentValue float64   `json:"current_value"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
