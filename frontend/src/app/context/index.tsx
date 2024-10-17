@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { createContext, useEffect, useState } from "react";
 import { queryKeys } from "../react-query/constants";
@@ -11,7 +12,7 @@ export const AuthContext = createContext({
   user: undefined as userProps | undefined,
   token: undefined as string | undefined,
   isAuthenticated: false,
-  authenticate: (token: string) => {},
+  authenticate: (token: any) => {},
   logout: () => {},
   updateUser: (data: userProps) => {},
 });
@@ -21,6 +22,7 @@ function AuthContextProvider({ children }: ChildProps) {
   const [user, setUser] = useState<userProps | undefined>(undefined);
   const userDetails = useAuthenticatedUser();
   const queryClient = useQueryClient();
+  
   useEffect(() => {
     if (!isAuthenticated()) {
       logout();
@@ -59,18 +61,32 @@ function AuthContextProvider({ children }: ChildProps) {
     setUser(data);
   }
 
-  function authenticate(data: string) {
-    setAuthToken(data);
-    const decoded = getDecodedJWT();
+  // function authenticate(data: string) {
+  //   setAuthToken(data);
+  //   const decoded = getDecodedJWT();
+
+  //   const userPropsObj: userProps = {
+  //     _id: decoded?._id || "",
+  //     firstname: "",
+  //     lastname: "",
+  //     middlename: "",
+  //     fullname: "",
+  //     phone: "",
+  //     email: decoded?.email || "",
+  //   };
+
+  //   setUser(userPropsObj);
+  //   setStoredUser(userPropsObj);
+  // }
+  function authenticate(data: any) {
+    setAuthToken(data.token);
 
     const userPropsObj: userProps = {
-      _id: decoded?._id || "",
-      firstname: "",
-      lastname: "",
-      middlename: "",
-      fullname: "",
-      phone: "",
-      email: decoded?.email || "",
+      id: data?.id || "",
+      first_name: data?.first_name || "",
+      last_name: data?.last_name || "",
+      username: data?.username || "",
+      email: data?.email || "",
     };
 
     setUser(userPropsObj);

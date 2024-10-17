@@ -8,17 +8,21 @@ export interface ChildProps {
   children: JSX.Element[] | JSX.Element;
 }
 
+// export interface userProps {
+//   _id: string;
+//   firstname: string;
+//   lastname: string;
+//   phone: string;
+//   email: string;
+//   role?: string;
+// }
 export interface userProps {
-  _id: string;
-  firstname: string;
-  lastname: string;
-  middlename: string;
-  fullname: string;
-  phone: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
   email: string;
   role?: string;
-  birthday?: string;
-  gender?: string;
 }
 
 export interface IDecodedUser {
@@ -46,3 +50,13 @@ export interface RegisterProps {
   last_name: string;
 }
 
+export interface TransactionProps {
+  id: number;
+  category: string;
+  amount: number;
+  date: string;
+}
+
+export interface TransactionsListProps {
+  transactions: TransactionProps[];
+}

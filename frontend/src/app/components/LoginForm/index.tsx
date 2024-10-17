@@ -4,7 +4,6 @@ import { LoginProps } from "../../interface";
 import { useLogin } from "../../hooks/auth";
 import { useIsMutating } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
-import { successAlert } from "../../utils";
 
 export const LoginForm: React.FC<LoginFormProps> = ({ setIsLogin }) => {
   const [formData, setFormData] = React.useState<LoginProps>({
@@ -12,7 +11,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ setIsLogin }) => {
     password: "",
   });
 
-  const { mutate, isSuccess } = useLogin();
+  const { mutate } = useLogin();
   const isLoading = useIsMutating();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,19 +26,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ setIsLogin }) => {
     });
   };
 
-  if (isSuccess) {
-    successAlert("Logged in successfully");
-    setIsLogin(true);
-  }
-
   return (
     <div className="formContainer">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Username"
-          name="username"
+          placeholder="Email"
+          name="email"
           onChange={handleChange}
         />
         <input
