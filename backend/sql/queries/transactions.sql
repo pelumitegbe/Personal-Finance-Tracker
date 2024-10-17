@@ -12,3 +12,13 @@ WHERE user_id = $1;
 DELETE FROM transactions
 WHERE id =$1 and user_id = $2
 RETURNING *;
+
+-- name: GetTransactionById :one
+SELECT * FROM transactions
+WHERE id = $1;
+
+-- name: UpdateTransaction :one
+UPDATE transactions
+  SET amount = $3, description = $4,transaction_type = $5, categories_id = $6,updated_at = $7
+  WHERE id = $1 and user_id=$2
+RETURNING *;

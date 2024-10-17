@@ -10,6 +10,7 @@ import (
 
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// getting the token from request header
 		clientToken := c.Request.Header.Get("token")
 		if clientToken == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "No authorization header provided"})
@@ -17,6 +18,7 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 
+		// validating our token and retrieving its claims
 		claims, msg := tokens.ValidateToken(clientToken)
 		if msg != "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
@@ -24,6 +26,7 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 
+		// check if it is access token or not
 		if claims.Token_Type != "access" {
 			c.JSON(
 				http.StatusUnauthorized,
@@ -33,6 +36,7 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 
+		// setting different variables for further operations
 		c.Set("username", claims.Username)
 		c.Set("email", claims.Email)
 		c.Set("uid", claims.Uid)
