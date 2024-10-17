@@ -24,6 +24,15 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 
+		if claims.Token_Type != "access" {
+			c.JSON(
+				http.StatusUnauthorized,
+				gin.H{"error": "Invalid token type! Token must be access"},
+			)
+			c.Abort()
+			return
+		}
+
 		c.Set("username", claims.Username)
 		c.Set("email", claims.Email)
 		c.Set("uid", claims.Uid)

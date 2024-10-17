@@ -25,3 +25,6 @@ UPDATE users
   SET token = $2, refresh_token= $3, updated_at = $4
   WHERE id = $1
 RETURNING *;
+
+-- name: GetRefreshTokenByID :one
+SELECT refresh_token FROM users WHERE id = $1;

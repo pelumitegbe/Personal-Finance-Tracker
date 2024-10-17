@@ -66,6 +66,17 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 	return err
 }
 
+const getRefreshTokenByID = `-- name: GetRefreshTokenByID :one
+SELECT refresh_token FROM users WHERE id = $1
+`
+
+func (q *Queries) GetRefreshTokenByID(ctx context.Context, id uuid.UUID) (sql.NullString, error) {
+	row := q.db.QueryRowContext(ctx, getRefreshTokenByID, id)
+	var refresh_token sql.NullString
+	err := row.Scan(&refresh_token)
+	return refresh_token, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id, username, email, password, first_name, last_name, created_at, updated_at, token, refresh_token, role FROM users WHERE email = $1
 `
