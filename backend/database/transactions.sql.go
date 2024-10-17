@@ -136,3 +136,67 @@ func (q *Queries) GetAllTransactions(ctx context.Context, userID uuid.UUID) ([]G
 	}
 	return items, nil
 }
+
+const getTransactionById = `-- name: GetTransactionById :one
+SELECT id, amount, description, categories_id, user_id, transaction_type, transaction_date, created_at, updated_at FROM transactions
+WHERE id = $1
+`
+
+func (q *Queries) GetTransactionById(ctx context.Context, id uuid.UUID) (Transaction, error) {
+	row := q.db.QueryRowContext(ctx, getTransactionById, id)
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.Amount,
+		&i.Description,
+		&i.CategoriesID,
+		&i.UserID,
+		&i.TransactionType,
+		&i.TransactionDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateTransaction = `-- name: UpdateTransaction :one
+UPDATE transactions
+  SET amount = $3, description = $4,transaction_type = $5, categories_id = $6,updated_at = $7
+  WHERE id = $1 and user_id=$2
+RETURNING id, amount, description, categories_id, user_id, transaction_type, transaction_date, created_at, updated_at
+`
+
+type UpdateTransactionParams struct {
+	ID              uuid.UUID      `json:"id"`
+	UserID          uuid.UUID      `json:"user_id"`
+	Amount          string         `json:"amount"`
+	Description     sql.NullString `json:"description"`
+	TransactionType string         `json:"transaction_type"`
+	CategoriesID    uuid.UUID      `json:"categories_id"`
+	UpdatedAt       time.Time      `json:"updated_at"`
+}
+
+func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error) {
+	row := q.db.QueryRowContext(ctx, updateTransaction,
+		arg.ID,
+		arg.UserID,
+		arg.Amount,
+		arg.Description,
+		arg.TransactionType,
+		arg.CategoriesID,
+		arg.UpdatedAt,
+	)
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.Amount,
+		&i.Description,
+		&i.CategoriesID,
+		&i.UserID,
+		&i.TransactionType,
+		&i.TransactionDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
