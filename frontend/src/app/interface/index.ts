@@ -1,3 +1,5 @@
+import { FC } from "react";
+
 export interface LayoutProps {
   name: string;
   pageTitle: string;
@@ -59,4 +61,12 @@ export interface TransactionProps {
 
 export interface TransactionsListProps {
   transactions: TransactionProps[];
+}
+export interface DashboardCardProps {
+  Icon: FC;
+  title: string;
+  count: number;
+  url?: string;
+  color: string;
+  colorInner: string;
 }

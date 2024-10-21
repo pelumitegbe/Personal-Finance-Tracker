@@ -1,0 +1,42 @@
+
+.dashboard{
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-direction: column;
+}
+.dashboard .cardFlex{
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin-bottom: 1rem;
+  justify-content: space-between;
+}
+.dashboard .chart {
+  display: flex;
+  width: 100%;
+  flex-basis: 65%;
+  background: white;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 2rem;
+  border-radius: 10px;
+  flex-direction: column;
+}
+.dashboard .chart h3 {
+  margin-bottom: 0.5rem;
+}
+.dashboard .chart p {
+  font-size: 12px;
+  margin-bottom: 0.5rem;
+}
+.dashboard .tableContainer {
+  display: flex;
+  width: 100%;
+  flex-basis: 100%;
+  background: white;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 2rem;
+  border-radius: 10px;
+  flex-direction: column;
+}

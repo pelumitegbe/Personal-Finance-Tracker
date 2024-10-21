@@ -1,0 +1,29 @@
+/* table.css */
+
+.customTable {
+  width: 100%;
+}
+.customTable table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 0;
+}
+.customTable thead {
+  background: rgba(233, 108, 114, 0.09);
+}
+.customTable th,
+.customTable td {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.customTable thead tr {
+  background-color: #f2f2f2;
+}
+.customTable button {
+  padding: 0.5rem;
+  border: 1px solid red;
+  border-radius: 5px;
+  color: red;
+  background: white;
+}
