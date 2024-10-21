@@ -23,7 +23,7 @@ const TransactionsChart: React.FC<TransactionsListProps> = ({
 
   const option = {
     title: {
-      text: "Transactions by Category",
+      text: "Expenses by Category",
       left: "center",
       top: "bottom",
       textStyle: {
@@ -41,7 +41,7 @@ const TransactionsChart: React.FC<TransactionsListProps> = ({
       padding: 2,
       itemGap: 5,
       textStyle: {
-        fontSize: 16,
+        fontSize: 11,
         color: "#4e4e4e",
       },
     },
@@ -88,7 +88,7 @@ const TransactionsChart: React.FC<TransactionsListProps> = ({
     <ReactECharts
       option={option}
       style={{
-        height: `500px`,
+        height: `400px`,
         width: "100%",
       }}
     />
