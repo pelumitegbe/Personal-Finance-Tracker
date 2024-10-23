@@ -5,6 +5,7 @@ import { RegisterProps } from "../../interface";
 import { useIsMutating } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
 import { successAlert } from "../../utils";
+
 export const RegisterForm: React.FC<LoginFormProps> = ({ setIsLogin }) => {
   const [formData, setFormData] = React.useState<RegisterProps>({
     first_name: "",

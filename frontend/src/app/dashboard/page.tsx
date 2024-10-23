@@ -17,7 +17,7 @@ export default function DashboardPage() {
   const dummyTransactions: TransactionProps[] = [
     { id: 1, category: "Groceries", amount: 50.5, date: "2024-10-01" },
     { id: 2, category: "Entertainment", amount: 120.0, date: "2024-10-05" },
-    { id: 3, category: "Rent", amount: 800.0, date: "2024-10-03" },
+    { id: 3, category: "Rent", amount: 805.0, date: "2024-10-03" },
     { id: 4, category: "Utilities", amount: 150.0, date: "2024-10-08" },
     { id: 5, category: "Transportation", amount: 40.0, date: "2024-10-10" },
   ];
