@@ -1,0 +1,33 @@
+.account {
+  display: flex;
+  background: white;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  gap: 2rem;
+  border-radius: 20px;
+}
+.account p {
+  font-weight: 500;
+}
+.account form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  justify-content: center;
+}
+.personalDet {
+  gap: 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.account button {
+  padding: 1rem 2rem;
+  color: white;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background: #c80016;
+}
