@@ -5,6 +5,7 @@ import { RegisterProps } from "../../interface";
 import { useIsMutating } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
 import { successAlert } from "../../utils";
+import FormInput from "../../components/FormInput";
 
 export const RegisterForm: React.FC<LoginFormProps> = ({ setIsLogin }) => {
   const [formData, setFormData] = React.useState<RegisterProps>({
@@ -39,35 +40,41 @@ export const RegisterForm: React.FC<LoginFormProps> = ({ setIsLogin }) => {
     <div className="formContainer">
       <h2>Signup</h2>
       <form onSubmit={handleSubmit}>
-        <input
+        <FormInput
           type="text"
           placeholder="Firstname"
           name="first_name"
           onChange={handleChange}
+          value={formData?.first_name}
         />
-        <input
+        <FormInput
           type="text"
           placeholder="Lastname"
           name="last_name"
           onChange={handleChange}
+          value={formData?.last_name}
+
         />
-        <input
+        <FormInput
           type="text"
           placeholder="Username"
           name="username"
           onChange={handleChange}
+           value={formData?.username}
         />
-        <input
+        <FormInput
           type="email"
           placeholder="Email"
           name="email"
           onChange={handleChange}
+           value={formData?.email}
         />
-        <input
+        <FormInput
           type="password"
           placeholder="Password"
           name="password"
           onChange={handleChange}
+           value={formData?.password}
         />
         <button type="submit">
           Signup

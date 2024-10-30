@@ -40,7 +40,7 @@ export interface IDecodedUser {
 }
 
 export interface LoginProps {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -69,4 +69,12 @@ export interface DashboardCardProps {
   url?: string;
   color: string;
   colorInner: string;
+}
+export interface FormInputProps {
+  name: string;
+  value: string;
+  placeholder?: string;
+  type: string;
+  disabled?: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }

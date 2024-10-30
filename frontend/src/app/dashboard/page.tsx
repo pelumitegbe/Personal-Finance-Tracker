@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Layout from "./../layout/index";
+import Layout from "../layout/index";
 import { TransactionProps } from "../interface";
 import TransactionsChart from "../components/TransactionsChart";
 import TableContainer from "../components/TableContainer";
