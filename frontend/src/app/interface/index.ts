@@ -57,6 +57,7 @@ export interface TransactionProps {
   category: string;
   amount: number;
   date: string;
+  description: string;
 }
 
 export interface TransactionsListProps {
@@ -69,6 +70,12 @@ export interface DashboardCardProps {
   url?: string;
   color: string;
   colorInner: string;
+}
+export interface TransactionCardProps {
+  category: string;
+  amount: number;
+  date: string;
+  description: string;
 }
 export interface FormInputProps {
   name: string;
