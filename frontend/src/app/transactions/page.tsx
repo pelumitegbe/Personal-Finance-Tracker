@@ -67,9 +67,9 @@ export default function DashboardPage() {
 
   return (
     <Layout name="Transactions" pageTitle="Transactions">
-      <div className="flex flex-col md:flex-row gap-6 p-6">
+      <div className="flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-1/3 space-y-6">
-          <Card className="bg-white border-2 border-black rounded-lg overflow-hidden">
+          <Card className="bg-white border-2 border-grey rounded-lg overflow-hidden">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-2">Current Balance</h2>
               <p className={`text-4xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>

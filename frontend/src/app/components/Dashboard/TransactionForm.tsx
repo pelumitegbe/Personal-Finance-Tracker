@@ -47,7 +47,7 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
   };
 
   return (
-    <Card className="bg-white border-2 border-black rounded-lg overflow-hidden">
+    <Card className="bg-white border-2 border-grey rounded-lg overflow-hidden">
       <CardContent className="p-6">
         <h2 className="text-xl font-bold mb-4">Add Transaction</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -57,7 +57,7 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="border-2 border-black mt-1 rounded-md"
+              className="border-2 border-grey mt-1 rounded-md"
               required
             />
           </div>
@@ -68,7 +68,7 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="border-2 border-black mt-1 rounded-md"
+              className="border-2 border-grey mt-1 rounded-md"
               required
               min="0"
               step="0.01"
@@ -77,10 +77,10 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
           <div>
             <Label htmlFor="type" className="font-semibold">Type</Label>
             <Select value={type} onValueChange={(value: 'income' | 'expense') => setType(value)}>
-              <SelectTrigger className="border-2 border-black mt-1 rounded-md">
+              <SelectTrigger className="border-2 border-grey mt-1 rounded-md">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border-2 border-black rounded-md shadow-lg">
+              <SelectContent className="bg-white border-2 border-grey rounded-md shadow-lg">
                 <SelectItem value="expense">Expense</SelectItem>
                 <SelectItem value="income">Income</SelectItem>
               </SelectContent>
@@ -89,10 +89,10 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
           <div>
             <Label htmlFor="category" className="font-semibold">Category</Label>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="border-2 border-black mt-1 rounded-md">
+              <SelectTrigger className="border-2 border-grey mt-1 rounded-md">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border-2 border-black rounded-md shadow-lg">
+              <SelectContent className="bg-white border-2 border-grey rounded-md shadow-lg">
                 {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
