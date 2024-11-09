@@ -1,15 +1,4 @@
 {
-<<<<<<< HEAD
-  "name": "personal-finance-tracker",
-  "version": "1.0.0",
-  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
-=======
   "name": "finance-tracker",
   "version": "0.1.0",
   "private": true,
@@ -50,5 +39,4 @@
     "tailwindcss": "^3.4.13",
     "typescript": "^5"
   }
->>>>>>> jithin
 }

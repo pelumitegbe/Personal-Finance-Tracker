@@ -1,0 +1,33 @@
+.transactionCard {
+	display: flex;
+	flex-direction: column;
+	flex: 0 0 300px;
+	padding: 2rem;
+	border-radius: 10px;
+	background: white;
+	/* box-shadow: 0px 4px 60px 0px #e5e5e5; */
+	text-decoration: none;
+	color: black;
+	justify-content: space-between;
+	align-items: flex-start;
+	border: 1px solid #dfdfdf;
+}
+
+.transactionCard p {
+	font-size: 14px;
+	margin-bottom: 1rem;
+	color: #8b8b8b;
+}
+
+.transactionCard h1 {
+	color: crimson;
+	font-size: 24px;
+}
+
+.transactionCard h2 {
+	font-size: 18px;
+}
+
+.transactionCard p:last-child {
+	align-self: flex-end;
+}

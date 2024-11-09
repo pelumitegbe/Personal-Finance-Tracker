@@ -19,7 +19,7 @@ interface TransactionListProps {
 
 export default function TransactionList({ transactions, onDeleteTransaction }: TransactionListProps) {
   return (
-    <Card className="bg-white border-2 border-black rounded-lg overflow-hidden">
+    <Card className="bg-white border-2 border-grey rounded-lg overflow-hidden">
       <CardContent className="p-6">
         <h2 className="text-xl font-bold mb-4">Recent Transactions</h2>
         {transactions.length === 0 ? (
