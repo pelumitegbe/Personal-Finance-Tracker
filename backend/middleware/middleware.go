@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 	"github.com/pelumitegbe/Personal-Finance-Tracker/tokens"
 )
 
+// middleware for authentication
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// getting the token from request header
@@ -40,13 +42,16 @@ func Authentication() gin.HandlerFunc {
 		c.Set("username", claims.Username)
 		c.Set("email", claims.Email)
 		c.Set("uid", claims.Uid)
+		c.Set("role", claims.Role)
 		c.Next()
 	}
 }
 
+// function to check if the requesting user is admin or not
 func AdminAuthorizaton() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userRole, exists := c.Get("role")
+		fmt.Print(userRole)
 		if !exists || userRole != "admin" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "You are not authorized"})
 			c.Abort()
