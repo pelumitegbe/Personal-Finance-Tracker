@@ -10,6 +10,8 @@ import Layout from "../layout/index";
 import { useCreateTransaction, useTransaction } from "../hooks/transactions";
 import { Transaction } from "../interface";
 import { AuthContext } from "../context";
+import { useCategory } from "../hooks/category";
+import { Category } from "../interface";
 
 export default function DashboardPage() {
 	const [filteredTransactions, setFilteredTransactions] = useState<
@@ -17,6 +19,7 @@ export default function DashboardPage() {
 	>([]);
 	const [balance, setBalance] = useState(0);
 	const [categoryFilter, setCategoryFilter] = useState("All");
+	const categories: Category[] = useCategory();
 
 	const { user } = useContext(AuthContext);
 
@@ -42,11 +45,14 @@ export default function DashboardPage() {
       if (categoryFilter === "All") {
         setFilteredTransactions(transactions || []);
       } else {
-        setFilteredTransactions(transactions?.filter((t) => t.category === categoryFilter) || []);
+				const category = categories?.find(c =>c?.name === categoryFilter)
+				setFilteredTransactions(transactions?.filter((t) => t.categories_id === category.id) || []);
       }
     };
     updateFilteredTransactions();
   }, [categoryFilter, transactions]);
+
+	console.log(transactions)
 
   const addTransaction = useCallback((transaction: Transaction) => {
     const newTransaction = { ...transaction, amount: transaction?.amount?.toString() };
