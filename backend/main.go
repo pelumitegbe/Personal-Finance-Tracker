@@ -50,7 +50,7 @@ func main() {
 		AllowAllOrigins:  true,
 		// AllowOrigins:     []string{"http://localhost:3000"}, // Allow only frontend origin
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}, // Allowed methods
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"}, // Allowed headers
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "token"}, // Allowed headers
 		ExposeHeaders:    []string{"Content-Length"}, // Expose specific headers
 		AllowCredentials: true, // Allow credentials like cookies
 	}

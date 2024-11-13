@@ -16,7 +16,7 @@ async function getMe() {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getLoginToken()}`,
+      "token": `${getLoginToken()}`,
     },
   });
 
@@ -25,7 +25,7 @@ async function getMe() {
 
 export function useGetMe() {
   const fallback = {};
-  const { data = fallback, isError, error } = useQuery<any, ErrorResponse>({
+  const { data = fallback, isError, error } = useQuery<unknown, ErrorResponse>({
     queryKey: [queryKeys.user],
     queryFn: () => getMe(),
   });

@@ -3,11 +3,11 @@ import { axiosInstance } from "../axios-Instance";
 import { errorAlert, ErrorResponse } from "../utils";
 import { queryKeys } from "../react-query/constants";
 import { getLoginToken } from "../storage";
-import { Transaction } from '../interface'
 
-async function addTransaction(formData: Transaction) {
+
+async function addCategory(formData: unknown) {
   const data = await axiosInstance({
-    url: `/users/transactions`,
+    url: `/admin/category`,
     method: "POST",
     data: formData,
     headers: {
@@ -16,25 +16,25 @@ async function addTransaction(formData: Transaction) {
     },
   });
 
-  return data?.data as Transaction;
+  return data;
 }
 
-const getTransaction = async () => {
+const getCategory = async () => {
   const data = await axiosInstance({
-    url: "/users/transactions",
+    url: "/category",
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "token": `${getLoginToken()}`,
+      // "token": `${getLoginToken()}`,
     },
   });
-  return data?.data?.data;
+  return data?.data;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function updateTransaction(formData: any) {
+async function updateCategory(formData: any) {
   const data = await axiosInstance({
-    url: `/users/transactions/${formData["_id"]}`,
+    url: `/admin/category/${formData["_id"]}`,
     method: "PUT",
     data: formData,
     headers: {
@@ -46,9 +46,9 @@ async function updateTransaction(formData: any) {
   return data;
 }
 
-async function deleteTransaction(formData: unknown) {
+async function deleteCategory(formData: unknown) {
   const data = await axiosInstance({
-    url: `/users/transactions/${formData}`,
+    url: `/admin/category/${formData}`,
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -60,36 +60,12 @@ async function deleteTransaction(formData: unknown) {
 }
 
 
-  export function useCreateTransaction() {
-    const queryClient = useQueryClient();
-    const { mutate, isSuccess, isError, error, reset } = useMutation<Transaction, ErrorResponse, Transaction, unknown>({
-      mutationFn: (formData: Transaction) => addTransaction(formData),
-      onSuccess: () => {
-        queryClient.invalidateQueries({queryKey:[queryKeys.transaction]});
-      },
-      onError: (error) => {
-        errorAlert(error);
-      },
-    });
-    return { mutate, isSuccess, isError, error, reset };
-  }
-
-export function useTransaction() {
-  const fallback = undefined;
-  const { data = fallback } = useQuery({
-    queryKey: [queryKeys.transaction],
-    queryFn: () => getTransaction(),
-  });
-  return data;
-}
-
-export function useUpdateTransaction() {
+export function useCreateCategory() {
   const queryClient = useQueryClient();
   const { mutate, isSuccess, isError, error, reset } = useMutation<unknown, ErrorResponse>({
-    mutationFn: (formData) => updateTransaction(formData),
+    mutationFn: (formData) => addCategory(formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [queryKeys.transaction]});
+      queryClient.invalidateQueries({queryKey:[queryKeys.category]});
     },
     onError: (error) => {
       errorAlert(error);
@@ -98,12 +74,36 @@ export function useUpdateTransaction() {
   return { mutate, isSuccess, isError, error, reset };
 }
 
-export function useDeleteTransaction() {
+export function useCategory() {
+  const fallback = [];
+  const { data = fallback } = useQuery({
+    queryKey: [queryKeys.category],
+    queryFn: () => getCategory(),
+  });
+  return data;
+}
+
+export function useUpdateCategory() {
   const queryClient = useQueryClient();
   const { mutate, isSuccess, isError, error, reset } = useMutation<unknown, ErrorResponse>({
-    mutationFn: (formData) => deleteTransaction(formData),
+    mutationFn: (formData) => updateCategory(formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: [queryKeys.transaction]});
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.category]});
+    },
+    onError: (error) => {
+      errorAlert(error);
+    },
+  });
+  return { mutate, isSuccess, isError, error, reset };
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+  const { mutate, isSuccess, isError, error, reset } = useMutation<unknown, ErrorResponse>({
+    mutationFn: (formData) => deleteCategory(formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: [queryKeys.category]});
     },
     onError: (error) => {
       errorAlert(error);
