@@ -7,11 +7,12 @@ import CategoryFilter from "../components/Dashboard/CategoryFilter";
 import AudioRecorder from "../components/Dashboard/AudioRecorder";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "../layout/index";
-import { useCreateTransaction, useTransaction } from "../hooks/transactions";
+import { useCreateTransaction, useDeleteTransaction, useTransaction } from "../hooks/transactions";
 import { Transaction } from "../interface";
 import { AuthContext } from "../context";
 import { useCategory } from "../hooks/category";
 import { Category } from "../interface";
+import swal from "sweetalert";
 
 export default function DashboardPage() {
 	const [filteredTransactions, setFilteredTransactions] = useState<
@@ -24,6 +25,8 @@ export default function DashboardPage() {
 	const { user } = useContext(AuthContext);
 
 	const { mutate, isSuccess, isError, error, reset } = useCreateTransaction();
+
+	const { mutate: del} = useDeleteTransaction();
 
 	const trans = useTransaction();
 
@@ -60,7 +63,20 @@ export default function DashboardPage() {
   }, [mutate]);
 
 	const deleteTransaction = (id: number) => {
-		console.log(`Deleting transaction with id: ${id}`);
+		swal({
+			title: "Are you sure?",
+			text: "Once deleted, you will not be able to recover this",
+			icon: "warning",
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			//    @ts-expect-error
+			buttons: true,
+			dangerMode: true,
+		  }).then((willDelete) => {
+			if (willDelete) {
+			  // mutateDelete(res.ID);
+			  del(id);
+						}
+		  });
 		// setTransactions((prev) => prev.filter((t) => t.id !== id));
 	};
 

@@ -12,7 +12,7 @@ const TransactionsChart: React.FC<TransactionsListProps> = ({
   const categories: Category[] = useCategory();
 
    // Map categories_id to their names for easy lookup
-   const categoryMap = categories.reduce((map, category) => {
+   const categoryMap = categories?.reduce((map, category) => {
     map[category.id] = category.name;
     return map;
   }, {} as { [key: string]: string });

@@ -28,7 +28,7 @@ export default function CategoryFilter({ onCategoryChange }: CategoryFilterProps
         <SelectItem value="All" className="hover:bg-gray-100">
               All
             </SelectItem>
-          {categories.map((category) => (
+          {categories?.map((category) => (
             <SelectItem key={category.id} value={category.name} className="hover:bg-gray-100">
               {category.name}
             </SelectItem>
