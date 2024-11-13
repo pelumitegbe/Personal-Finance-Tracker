@@ -1,58 +1,67 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import TransactionForm from "../components/Dashboard/TransactionForm";
 import TransactionList from "../components/Dashboard/TransactionList";
 import CategoryFilter from "../components/Dashboard/CategoryFilter";
 import AudioRecorder from "../components/Dashboard/AudioRecorder";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "../layout/index";
-import { useCreateTransaction } from "../hooks/transactions";
+import { useCreateTransaction, useTransaction } from "../hooks/transactions";
 import { Transaction } from "../interface";
+import { AuthContext } from "../context";
+import { useCategory } from "../hooks/category";
+import { Category } from "../interface";
 
 export default function DashboardPage() {
-	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [filteredTransactions, setFilteredTransactions] = useState<
 		Transaction[]
 	>([]);
 	const [balance, setBalance] = useState(0);
 	const [categoryFilter, setCategoryFilter] = useState("All");
+	const categories: Category[] = useCategory();
+
+	const { user } = useContext(AuthContext);
 
 	const { mutate, isSuccess, isError, error, reset } = useCreateTransaction();
 
+	const trans = useTransaction();
+
+// Memoize the transactions based on user.id, avoiding unnecessary recomputations
+	const transactions = useMemo(() => {
+		return trans?.filter((t) => t?.user_id === user?.id) || [];
+	}, [user?.id, trans]);
+
 	useEffect(() => {
-		console.log("Recalculating balance. Current transactions:", transactions);
-		const newBalance = transactions.reduce((acc, transaction) => {
-			console.log(`Processing transaction:`, transaction);
-			const change = parseFloat(transaction.amount);
-			console.log(`Change to balance: ${change}`);
-			return acc + change;
-		}, 0);
-		console.log(`New balance calculated: ${newBalance}`);
-		setBalance(newBalance);
+    const newBalance = transactions?.reduce((acc, transaction) => {
+      const change = parseFloat(transaction.amount);
+      return transaction.transaction_type === "income" ? acc + change : acc - change;
+    }, 0) || 0;
+    setBalance(newBalance);
+  }, [transactions]);
 
-		if (categoryFilter === "All") {
-			setFilteredTransactions(transactions);
-		} else {
-			setFilteredTransactions(
-				transactions.filter((t) => t.category === categoryFilter),
-			);
-		}
-	}, [transactions, categoryFilter]);
+  useEffect(() => {
+    const updateFilteredTransactions = () => {
+      if (categoryFilter === "All") {
+        setFilteredTransactions(transactions || []);
+      } else {
+				const category = categories?.find(c =>c?.name === categoryFilter)
+				setFilteredTransactions(transactions?.filter((t) => t.categories_id === category.id) || []);
+      }
+    };
+    updateFilteredTransactions();
+  }, [categoryFilter, transactions]);
 
-	const addTransaction = (transaction: Transaction) => {
-		const newTransaction: Transaction = {
-			...transaction,
-			amount: transaction?.amount?.toString(),
-		};
-		console.log("Adding new transaction:", newTransaction);
-		mutate(newTransaction);
-		setTransactions((prev) => [newTransaction, ...prev]);
-	};
+	console.log(transactions)
+
+  const addTransaction = useCallback((transaction: Transaction) => {
+    const newTransaction = { ...transaction, amount: transaction?.amount?.toString() };
+    mutate(newTransaction);
+  }, [mutate]);
 
 	const deleteTransaction = (id: number) => {
 		console.log(`Deleting transaction with id: ${id}`);
-		setTransactions((prev) => prev.filter((t) => t.id !== id));
+		// setTransactions((prev) => prev.filter((t) => t.id !== id));
 	};
 
 	const handleTransactionComplete = (
@@ -76,10 +85,9 @@ export default function DashboardPage() {
 						<CardContent className='p-6'>
 							<h2 className='text-2xl font-bold mb-2'>Current Balance</h2>
 							<p
-								className={`text-4xl font-bold ${
-									balance >= 0 ? "text-green-600" : "text-red-600"
-								}`}>
-								${balance.toFixed(2)}
+								className={`text-4xl font-bold ${balance >= 0 ? "text-green-600" : "text-red-600"
+									}`}>
+								${balance?.toFixed(2)}
 							</p>
 						</CardContent>
 					</Card>

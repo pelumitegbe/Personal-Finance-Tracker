@@ -10,16 +10,6 @@ import "./index.css";
 const Layout = ({ children, name, pageTitle }: LayoutProps) => {
 	const { user } = useContext(AuthContext);
 
-	// const defaultUser: userProps = {
-	//   id: "",
-	//   first_name: "Guest",
-	//   last_name: "",
-	//   username: "Guest User",
-	//   email: "",
-	// };
-
-	console.log({ user });
-
 	return (
 		<div
 			className='appContainer'
