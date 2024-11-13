@@ -76,6 +76,7 @@ export interface TransactionCardProps {
   amount: number;
   date: string;
   description: string;
+  type: string;
 }
 export interface FormInputProps {
   name: string;
