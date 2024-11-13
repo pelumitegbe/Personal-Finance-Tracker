@@ -7,15 +7,20 @@ import { getLoginToken, setStoredUser } from "../../storage";
 import {  isAuthenticated } from "../../utils";
 
 const userProfile = async () => {
-  const data = await axiosInstance({
-    url: "/auth/me",
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${getLoginToken()}`,
-    },
-  });
-  return data?.data?.data;
+  try {
+    const data = await axiosInstance({
+      url: "/auth/me",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "token": `${getLoginToken()}`,
+      },
+    });
+    return data?.data?.user;
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    throw error;
+  }
 };
 
 export function useAuthenticatedUser() {
@@ -25,22 +30,17 @@ export function useAuthenticatedUser() {
     enabled: isAuthenticated(),
     queryKey: [queryKeys.user],
     queryFn: () => userProfile(),
-    // isSuccess: (data: userProps) => {
-    //   authCtx.updateUser(data);
-    //   setStoredUser(data);
-    // },
-    // isError: (error: ErrorResponse) => {
-    //   authCtx.logout();
-    //   errorAlert(error);
-    // },
   });
-  if(isSuccess){
+
+  if (isSuccess && !authCtx.user) {
     authCtx.updateUser(data);
     setStoredUser(data);
   }
-  if(isError){
+
+  if (isError) {
+    console.error('Query error:', error);
     authCtx.logout();
-    console.log(error);
   }
+
   return data;
 }

@@ -85,3 +85,14 @@ export interface FormInputProps {
   disabled?: boolean;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
+export interface Category { id: string; name: string; created_at: string; }
+
+export interface Transaction {
+  id: number
+  description: string
+  amount: string | number
+  type: 'income' | 'expense'
+  category: string
+  date: string
+}
