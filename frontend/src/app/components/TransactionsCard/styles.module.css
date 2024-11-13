@@ -19,14 +19,14 @@
 	color: #8b8b8b;
 }
 
-.transactionCard h1 {
-	color: crimson;
-	font-size: 24px;
+.transactionCard h1{
+	font-weight: 600;
 }
+/* Styles for expense transactions */ 
+.expense h1, .expense h2 { color: #fd5181; } 
 
-.transactionCard h2 {
-	font-size: 18px;
-}
+/* Styles for income transactions */ 
+.income h1, .income h2 { color: #28a745; }
 
 .transactionCard p:last-child {
 	align-self: flex-end;
