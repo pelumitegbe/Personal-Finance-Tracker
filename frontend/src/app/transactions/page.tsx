@@ -1,101 +1,107 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import TransactionForm from '../components/Dashboard/TransactionForm'
-import TransactionList from '../components/Dashboard/TransactionList'
-import CategoryFilter from '../components/Dashboard/CategoryFilter'
-import AudioRecorder from '../components/Dashboard/AudioRecorder'
-import { Card, CardContent } from "@/components/ui/card"
+import React, { useState, useEffect } from "react";
+import TransactionForm from "../components/Dashboard/TransactionForm";
+import TransactionList from "../components/Dashboard/TransactionList";
+import CategoryFilter from "../components/Dashboard/CategoryFilter";
+import AudioRecorder from "../components/Dashboard/AudioRecorder";
+import { Card, CardContent } from "@/components/ui/card";
 import Layout from "../layout/index";
-
-interface Transaction {
-  id: number
-  description: string
-  amount: number
-  type: 'income' | 'expense'
-  category: string
-  date: string
-}
+import { useCreateTransaction } from "../hooks/transactions";
+import { Transaction } from "../interface";
 
 export default function DashboardPage() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([])
-  const [balance, setBalance] = useState(0)
-  const [categoryFilter, setCategoryFilter] = useState('All')
+	const [transactions, setTransactions] = useState<Transaction[]>([]);
+	const [filteredTransactions, setFilteredTransactions] = useState<
+		Transaction[]
+	>([]);
+	const [balance, setBalance] = useState(0);
+	const [categoryFilter, setCategoryFilter] = useState("All");
 
-  useEffect(() => {
-    console.log('Recalculating balance. Current transactions:', transactions);
-    const newBalance = transactions.reduce((acc, transaction) => {
-      console.log(`Processing transaction:`, transaction);
-      const change = transaction.amount;
-      console.log(`Change to balance: ${change}`);
-      return acc + change;
-    }, 0)
-    console.log(`New balance calculated: ${newBalance}`);
-    setBalance(newBalance)
+	const { mutate, isSuccess, isError, error, reset } = useCreateTransaction();
 
-    if (categoryFilter === 'All') {
-      setFilteredTransactions(transactions)
-    } else {
-      setFilteredTransactions(transactions.filter(t => t.category === categoryFilter))
-    }
-  }, [transactions, categoryFilter])
+	useEffect(() => {
+		console.log("Recalculating balance. Current transactions:", transactions);
+		const newBalance = transactions.reduce((acc, transaction) => {
+			console.log(`Processing transaction:`, transaction);
+			const change = parseFloat(transaction.amount);
+			console.log(`Change to balance: ${change}`);
+			return acc + change;
+		}, 0);
+		console.log(`New balance calculated: ${newBalance}`);
+		setBalance(newBalance);
 
-  const addTransaction = (transaction: Omit<Transaction, 'id' | 'date'>) => {
-    const newTransaction: Transaction = {
-      ...transaction,
-      id: Date.now(),
-      date: new Date().toISOString(),
-    }
-    console.log('Adding new transaction:', newTransaction);
-    setTransactions(prev => [newTransaction, ...prev])
-  }
+		if (categoryFilter === "All") {
+			setFilteredTransactions(transactions);
+		} else {
+			setFilteredTransactions(
+				transactions.filter((t) => t.category === categoryFilter),
+			);
+		}
+	}, [transactions, categoryFilter]);
 
-  const deleteTransaction = (id: number) => {
-    console.log(`Deleting transaction with id: ${id}`);
-    setTransactions(prev => prev.filter(t => t.id !== id))
-  }
+	const addTransaction = (transaction: Transaction) => {
+		const newTransaction: Transaction = {
+			...transaction,
+			amount: transaction?.amount?.toString(),
+		};
+		console.log("Adding new transaction:", newTransaction);
+		mutate(newTransaction);
+		setTransactions((prev) => [newTransaction, ...prev]);
+	};
 
-  const handleTransactionComplete = (parsedTransaction: Omit<Transaction, 'id'>) => {
-    console.log('Received parsed transaction from audio:', parsedTransaction);
-    addTransaction(parsedTransaction)
-  }
+	const deleteTransaction = (id: number) => {
+		console.log(`Deleting transaction with id: ${id}`);
+		setTransactions((prev) => prev.filter((t) => t.id !== id));
+	};
 
-  const handleAudioError = (error: string) => {
-    console.error("Audio recording error:", error)
-  }
+	const handleTransactionComplete = (
+		parsedTransaction: Omit<Transaction, "id">,
+	) => {
+		console.log("Received parsed transaction from audio:", parsedTransaction);
+		addTransaction(parsedTransaction);
+	};
 
-  return (
-    <Layout name="Transactions" pageTitle="Transactions">
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="w-full md:w-1/3 space-y-6">
-          <Card className="bg-white border-2 border-grey rounded-lg overflow-hidden">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-2">Current Balance</h2>
-              <p className={`text-4xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ${balance.toFixed(2)}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <TransactionForm onAddTransaction={addTransaction} />
+	const handleAudioError = (error: string) => {
+		console.error("Audio recording error:", error);
+	};
 
-          <div className="flex justify-center">
-            <AudioRecorder 
-              onTransactionComplete={handleTransactionComplete}
-              onError={handleAudioError}
-            />
-          </div>
-        </div>
+	return (
+		<Layout
+			name='Transactions'
+			pageTitle='Transactions'>
+			<div className='flex flex-col md:flex-row gap-6'>
+				<div className='w-full md:w-1/3 space-y-6'>
+					<Card className='bg-white border-2 border-grey rounded-lg overflow-hidden'>
+						<CardContent className='p-6'>
+							<h2 className='text-2xl font-bold mb-2'>Current Balance</h2>
+							<p
+								className={`text-4xl font-bold ${
+									balance >= 0 ? "text-green-600" : "text-red-600"
+								}`}>
+								${balance.toFixed(2)}
+							</p>
+						</CardContent>
+					</Card>
 
-        <div className="w-full md:w-2/3 space-y-6">
-          <CategoryFilter onCategoryChange={setCategoryFilter} />
-          <TransactionList 
-            transactions={filteredTransactions} 
-            onDeleteTransaction={deleteTransaction} 
-          />
-        </div>
-      </div>
-    </Layout>
-  )
+					<TransactionForm onAddTransaction={addTransaction} />
+
+					<div className='flex justify-center'>
+						<AudioRecorder
+							onTransactionComplete={handleTransactionComplete}
+							onError={handleAudioError}
+						/>
+					</div>
+				</div>
+
+				<div className='w-full md:w-2/3 space-y-6'>
+					<CategoryFilter onCategoryChange={setCategoryFilter} />
+					<TransactionList
+						transactions={filteredTransactions}
+						onDeleteTransaction={deleteTransaction}
+					/>
+				</div>
+			</div>
+		</Layout>
+	);
 }
