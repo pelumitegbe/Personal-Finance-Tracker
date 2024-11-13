@@ -10,6 +10,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Camera, Loader2, Receipt } from 'lucide-react';
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from "@/components/ui/tooltip"
 
 interface TransactionFormProps {
   onAddTransaction: (transaction: {
@@ -18,13 +25,15 @@ interface TransactionFormProps {
     type: 'income' | 'expense';
     category: string;
   }) => void;
+  onReceiptUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  isScanning: boolean;
 }
 
 const categories = [
   "Food", "Transportation", "Housing", "Utilities", "Entertainment", "Healthcare", "Education", "Other"
 ];
 
-export default function TransactionForm({ onAddTransaction }: TransactionFormProps) {
+export default function TransactionForm({ onAddTransaction, onReceiptUpload, isScanning }: TransactionFormProps) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<'income' | 'expense'>('expense');
@@ -49,7 +58,48 @@ export default function TransactionForm({ onAddTransaction }: TransactionFormPro
   return (
     <Card className="bg-white border-2 border-black rounded-lg overflow-hidden">
       <CardContent className="p-6">
-        <h2 className="text-xl font-bold mb-4">Add Transaction</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Add Transaction</h2>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onReceiptUpload}
+                    data-testid="scan-button"
+                  />
+                  <div className={`
+                    flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300
+                    ${isScanning ? 'bg-blue-100' : 'bg-gray-100 hover:bg-gray-200'}
+                    border border-gray-200
+                  `}>
+                    {isScanning ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                        <span className="text-sm text-blue-600">Scanning...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Receipt className="h-4 w-4 text-gray-600" />
+                        <span className="text-sm text-gray-600">Scan Receipt</span>
+                      </>
+                    )}
+                  </div>
+                </label>
+              </TooltipTrigger>
+              <TooltipContent side="left" className="bg-white p-3 border-2 border-gray-200 shadow-lg">
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm font-medium">Quick Add from Receipt</p>
+                  <p className="text-xs text-gray-500">Upload a receipt image to automatically fill transaction details</p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="description" className="font-semibold">Description</Label>
