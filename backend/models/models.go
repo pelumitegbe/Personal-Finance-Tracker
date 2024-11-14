@@ -65,3 +65,15 @@ type Balance struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
+
+type Budget struct {
+	ID          uuid.UUID `json:"id,omitempty"`
+	UserID      uuid.UUID `json:"user_id,omitempty"`
+	Amount      string    `json:"amount,omitempty"`
+	SpentAmount string    `json:"spent_amount,omitempty"`
+	Valid       bool      `json:"valid,omitempty"`
+	StartDate   time.Time `json:"start_date,omitempty"`
+	EndDate     time.Time `json:"end_date,omitempty"`
+	Created_At  time.Time `json:"created_at,omitempty"`
+	Updated_At  time.Time `json:"updated_at,omitempty"`
+}

@@ -11,6 +11,20 @@ import (
 	"github.com/google/uuid"
 )
 
+type Budget struct {
+	ID              uuid.UUID      `json:"id"`
+	UserID          uuid.UUID      `json:"user_id"`
+	Amount          string         `json:"amount"`
+	SpentAmount     string         `json:"spent_amount"`
+	RemainingAmount sql.NullString `json:"remaining_amount"`
+	SpentPercentage sql.NullString `json:"spent_percentage"`
+	Valid           bool           `json:"valid"`
+	StartDate       time.Time      `json:"start_date"`
+	EndDate         time.Time      `json:"end_date"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
+}
+
 type Category struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
