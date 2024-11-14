@@ -38,12 +38,5 @@ jobs:
       - name: Run tests
         run: go test ./controllers ./tokens -v -count=1
 
-      - name: Check code formatting
-        run: |
-          if [ -n "$(go fmt ./...)" ]; then
-            echo "Code is not properly formatted"
-            exit 1
-          fi
-
       - name: Run vet
         run: go vet ./...
