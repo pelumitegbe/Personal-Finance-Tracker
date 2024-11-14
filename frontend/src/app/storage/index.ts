@@ -9,13 +9,19 @@ export function setStoredUser(user: userProps) {
   localStorage.setItem("user", JSON.stringify(user));
 }
 
-// STUB: save login token to local storage
-export function setLoginToken(token: string) {
+// Save login and refresh tokens to local storage
+export function setLoginToken(token: string, refreshToken: string) {
   localStorage.setItem("token", JSON.stringify(token));
+  localStorage.setItem("refreshToken", JSON.stringify(refreshToken));
 }
 
 // STUB: get login token from local storage
 export function getLoginToken() {
   const storedToken = localStorage.getItem("token");
   return storedToken ? JSON.parse(storedToken) : null;
+}
+
+export function getRefreshToken() { 
+  const storedRefreshToken = localStorage.getItem("refreshToken"); 
+  return storedRefreshToken ? JSON.parse(storedRefreshToken) : null
 }
