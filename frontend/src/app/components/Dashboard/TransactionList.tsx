@@ -30,8 +30,8 @@ interface Transaction {
 	amount: number;
 	transaction_type: "income" | "expense";
 	category: string;
-	date: string;
-  timestamp: string;
+	created_at: string;
+  // timestamp: string;
 }
 
 interface TransactionListProps {
@@ -74,8 +74,8 @@ export default function TransactionList({ transactions, onDeleteTransaction }: T
             {transactions?.map((transaction) => {
               console.log('Rendering transaction:', {
                 id: transaction.id,
-                date: transaction.date,
-                formattedDate: formatDate(transaction.date)
+                date: transaction.created_at,
+                formattedDate: formatDate(transaction.created_at)
               });
 
               const CategoryIcon = categoryIcons[transaction.category as keyof typeof categoryIcons] || Package;
@@ -92,9 +92,9 @@ export default function TransactionList({ transactions, onDeleteTransaction }: T
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <span>{transaction.category}</span>
                         <span>•</span>
-                        <span>{formatDate(transaction.date)}</span>
+                        <span>{formatDate(transaction.created_at)}</span>
                         <span>•</span>
-                        <span>{transaction.timestamp}</span>
+                        <span>{transaction.created_at}</span>
                       </div>
                     </div>
                   </div>

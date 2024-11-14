@@ -43,10 +43,10 @@ interface Transaction {
   id: number
   description: string
   amount: number
-  type: 'income' | 'expense'
+  transaction_type: 'income' | 'expense'
   category: string
-  date: string
-  timestamp: string
+  created_at: string
+  // timestamp: string
 }
 
 // Add category icon mapping
@@ -89,6 +89,7 @@ export default function DashboardPage() {
     }, 0) || 0;
     setBalance(newBalance);
   }, [transactions]);
+
   const [isScanning, setIsScanning] = useState(false);
 
   // Hotkeys setup
@@ -114,7 +115,6 @@ export default function DashboardPage() {
     updateFilteredTransactions();
   }, [categoryFilter, transactions]);
 
-	console.log(transactions)
 
   const addTransaction = useCallback((transaction: Transaction) => {
     const newTransaction = { ...transaction, amount: transaction?.amount?.toString() };
@@ -133,8 +133,8 @@ export default function DashboardPage() {
 		  }).then((willDelete) => {
 			if (willDelete) {
 			  // mutateDelete(res.ID);
-			  del(id);
-						}
+			  del(id);			
+      }
 		  });
 		// setTransactions((prev) => prev.filter((t) => t.id !== id));
 	};
@@ -170,7 +170,7 @@ export default function DashboardPage() {
         addTransaction({
           description: data.parsedReceipt.store_name,
           amount: data.parsedReceipt.total_amount,
-          type: 'expense',
+          transaction_type: 'expense',
           category: data.parsedReceipt.category,
           date: data.parsedReceipt.date,
           timestamp: data.parsedReceipt.timestamp
