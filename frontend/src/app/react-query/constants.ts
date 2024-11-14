@@ -1,4 +1,5 @@
 export const queryKeys = {
   user: "user",
-  transaction: "transaction"
+  transaction: "transaction",
+  category: "category"
 };

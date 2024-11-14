@@ -14,6 +14,8 @@ interface ParsedTransaction {
   type: 'income' | 'expense';
   category: string;
   date: string;
+  timestamp: string;
+  day: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -39,7 +41,8 @@ export async function POST(request: NextRequest) {
 
     fs.unlinkSync(tempFilePath);
 
-    const currentDateTime = new Date().toLocaleString('en-US', { 
+    const now = new Date();
+    const currentDateTime = now.toLocaleString('en-US', { 
       timeZone: 'America/New_York',
       year: 'numeric',
       month: '2-digit',
@@ -49,10 +52,39 @@ export async function POST(request: NextRequest) {
       second: '2-digit'
     });
 
-    const prompt = `The current date and time is: ${currentDateTime}.
-    Parse the following transaction description into a JSON object with keys: description(which must be concise and relevant), amount, type (income or expense), category, and date. If no specific date is mentioned in the transaction, use the current date provided above. Here's the transaction description:
+    const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
 
-    "${transcription.text}"
+    const prompt = `The current date and time is: ${currentDateTime}.
+    Parse this transaction description into JSON, focusing on extracting any time/date references:
+
+    Examples of time references to handle:
+    - "spent $20 at McDonald's yesterday at 8pm" = subtract 1 day from current date
+    - "bought coffee this morning at 9am" = today at 9am
+    - "paid $50 for gas last Tuesday around noon" = most recent past Tuesday at 12pm
+    - "spent $100 on groceries two days ago at 3pm" = subtract 2 days from current date
+    - "lunch today at 1pm cost $15" = today at 1pm
+    - "Friday" = if today is Saturday and user says Friday, use yesterday's date
+
+    Format the response as:
+    {
+      "description": "name of the expense (maximum two words)",
+      "amount": number only (no currency symbols),
+      "type": "expense" or "income",
+      "category": one of ["Food", "Transportation", "Housing", "Utilities", "Entertainment", "Healthcare", "Education", "Other"],
+      "relative_date": any mentioned date reference (e.g., "yesterday", "Friday", "two days ago"),
+      "relative_time": any mentioned time (e.g., "8pm", "morning", "noon")
+    }
+
+    Transaction description: "${transcription.text}"
+
+    Parse time references carefully and set logical default times for common scenarios:
+    - Morning = 9:00 AM
+    - Afternoon = 2:00 PM
+    - Evening = 6:00 PM
+    - Night = 8:00 PM
+    - Lunch = 12:00 PM
+    - Dinner = 6:00 PM
+    - If no time context, use current time
 
     Respond only with the JSON object, no additional text.`;
 
@@ -70,11 +102,89 @@ export async function POST(request: NextRequest) {
       throw new Error('No content returned from language model');
     }
 
-    const parsedTransaction: ParsedTransaction = JSON.parse(content);
+    // Helper function to calculate the date
+    const calculateDate = (relativeDate: string): Date => {
+      const now = new Date();
+      const lowerRef = relativeDate.toLowerCase();
+      
+      // Handle "yesterday"
+      if (lowerRef.includes('yesterday')) {
+        return new Date(now.setDate(now.getDate() - 1));
+      }
+      
+      // Handle "X days ago"
+      const daysAgoMatch = lowerRef.match(/(\d+)\s*days?\s*ago/);
+      if (daysAgoMatch) {
+        return new Date(now.setDate(now.getDate() - parseInt(daysAgoMatch[1])));
+      }
+      
+      // Handle day names
+      const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      for (const day of days) {
+        if (lowerRef.includes(day)) {
+          const targetDay = days.indexOf(day);
+          const currentDay = now.getDay();
+          let diff = currentDay - targetDay;
+          if (diff <= 0) diff += 7; // If the day is ahead or today, get last week's occurrence
+          return new Date(now.setDate(now.getDate() - diff));
+        }
+      }
+      
+      return now;
+    };
+
+    // Clean and parse the response
+    const cleanedContent = content.trim().replace(/```json|```/g, '');
+    const parsedJson = JSON.parse(cleanedContent);
+    
+    // Calculate the actual date and time
+    const transactionDate = calculateDate(parsedJson.relative_date || '');
+    
+    // Parse time if provided
+    if (parsedJson.relative_time) {
+      const timeMatch = parsedJson.relative_time.match(/(\d+)(?::(\d+))?\s*(am|pm|noon|morning|afternoon|evening|night)/i);
+      if (timeMatch) {
+        let hour = 0;
+        let minute = 0;
+        
+        if (timeMatch[3].toLowerCase() === 'noon') {
+          hour = 12;
+        } else if (timeMatch[3].toLowerCase() === 'morning') {
+          hour = 9;
+        } else if (timeMatch[3].toLowerCase() === 'afternoon') {
+          hour = 14;
+        } else if (timeMatch[3].toLowerCase() === 'evening') {
+          hour = 18;
+        } else if (timeMatch[3].toLowerCase() === 'night') {
+          hour = 20;
+        } else {
+          hour = parseInt(timeMatch[1]);
+          if (timeMatch[3].toLowerCase() === 'pm' && hour !== 12) hour += 12;
+          if (timeMatch[3].toLowerCase() === 'am' && hour === 12) hour = 0;
+          minute = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
+        }
+        
+        transactionDate.setHours(hour, minute);
+      }
+    }
+
+    const parsedTransaction = {
+      ...parsedJson,
+      date: transactionDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }),
+      timestamp: transactionDate.toLocaleTimeString('en-US', { 
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      })
+    };
 
     return NextResponse.json({ 
       transcription: transcription.text,
-      parsedTransaction: parsedTransaction
+      parsedTransaction
     });
   } catch (error) {
     console.error('Error processing audio:', error);

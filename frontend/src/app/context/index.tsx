@@ -3,7 +3,7 @@
 import { createContext, useEffect, useState } from "react";
 import { queryKeys } from "../react-query/constants";
 import { getLoginToken, getStoredUser, setStoredUser } from "../storage";
-import { getDecodedJWT, isAuthenticated } from "../utils";
+import {  isAuthenticated } from "../utils";
 import { useAuthenticatedUser } from "./hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChildProps, userProps } from "../interface";
@@ -85,6 +85,7 @@ function AuthContextProvider({ children }: ChildProps) {
       id: data?.id || "",
       first_name: data?.first_name || "",
       last_name: data?.last_name || "",
+      role: data?.role || "",
       username: data?.username || "",
       email: data?.email || "",
     };

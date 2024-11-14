@@ -1,17 +1,29 @@
-import React from "react";
+import React, { useMemo } from "react";
 import ReactECharts from "echarts-for-react";
 import { TransactionsListProps } from "../../interface";
+import { useCategory } from "../../hooks/category";
+import { Category } from "../../interface";
 
 const TransactionsChart: React.FC<TransactionsListProps> = ({
   transactions,
 }) => {
-  // Calculate total amount per category
-  const categoryTotals: { [key: string]: number } = {};
 
-  transactions.forEach((transaction) => {
-    categoryTotals[transaction.category] =
-      (categoryTotals[transaction.category] || 0) + transaction.amount;
-  });
+  //fetch categories
+  const categories: Category[] = useCategory();
+
+   // Map categories_id to their names for easy lookup
+   const categoryMap = categories?.reduce((map, category) => {
+    map[category.id] = category.name;
+    return map;
+  }, {} as { [key: string]: string });
+
+   // Calculate total amount per category
+   const categoryTotals = transactions.reduce((totals, transaction) => {
+    const categoryName = categoryMap[transaction.categories_id] || "Other";
+    const currentTotal = (totals[categoryName] || 0) + parseFloat(transaction.amount);
+    totals[categoryName] = parseFloat(currentTotal.toFixed(2));
+    return totals;
+  }, {} as { [key: string]: number });
 
   // Prepare the data in the format that ECharts expects
   const chartData = Object.entries(categoryTotals).map(
@@ -34,7 +46,6 @@ const TransactionsChart: React.FC<TransactionsListProps> = ({
     legend: {
       left: "left",
       top: "top",
-      animation: true,
       orient: "vertical",
       itemWidth: 10,
       itemHeight: 10,

@@ -40,7 +40,7 @@ export interface IDecodedUser {
 }
 
 export interface LoginProps {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -57,6 +57,7 @@ export interface TransactionProps {
   category: string;
   amount: number;
   date: string;
+  description: string;
 }
 
 export interface TransactionsListProps {
@@ -69,4 +70,30 @@ export interface DashboardCardProps {
   url?: string;
   color: string;
   colorInner: string;
+}
+export interface TransactionCardProps {
+  category: string;
+  amount: number;
+  date: string;
+  description: string;
+  type: string;
+}
+export interface FormInputProps {
+  name: string;
+  value: string;
+  placeholder?: string;
+  type: string;
+  disabled?: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export interface Category { id: string; name: string; created_at: string; }
+
+export interface Transaction {
+  id: number
+  description: string
+  amount: string | number
+  type: 'income' | 'expense'
+  category: string
+  date: string
 }

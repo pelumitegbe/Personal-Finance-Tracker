@@ -1,103 +1,119 @@
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Mic, Square } from 'lucide-react';
+import { Mic, Square, Loader2 } from 'lucide-react';
 
 interface AudioRecorderProps {
-  onTransactionComplete: (transaction: {
-    description: string;
-    amount: number;
-    type: 'income' | 'expense';
-    category: string;
-    date: string;
-  }) => void;
+  onTransactionComplete: (transaction: any) => void;
   onError: (error: string) => void;
 }
 
 const AudioRecorder: React.FC<AudioRecorderProps> = ({ onTransactionComplete, onError }) => {
   const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<BlobPart[]>([]);
-
-  const toggleRecording = async () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  };
+  const chunksRef = useRef<Blob[]>([]);
 
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+      chunksRef.current = [];
 
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
       };
 
-      mediaRecorder.onstop = sendAudioToApi;
+      mediaRecorder.onstop = async () => {
+        setIsProcessing(true);
+        const audioBlob = new Blob(chunksRef.current, { type: 'audio/wav' });
+        await handleAudioUpload(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
 
       mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Error accessing microphone:', error);
-      onError('Failed to access microphone. Please ensure you have given permission to use the microphone.');
+      console.error('Error starting recording:', error);
+      onError('Could not access microphone');
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current) {
+    if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
   };
 
-  const sendAudioToApi = async () => {
-    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-    const formData = new FormData();
-    formData.append('audio', audioBlob, 'recording.wav');
-
+  const handleAudioUpload = async (audioBlob: Blob) => {
     try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob);
+
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
+      
       if (data.error) {
         throw new Error(data.error);
       }
 
-      console.log("Received transcription from API:", data.transcription);
-      console.log("Parsed transaction:", data.parsedTransaction);
-      
-      // Validate the parsed transaction
-      if (!data.parsedTransaction.type || !['income', 'expense'].includes(data.parsedTransaction.type)) {
-        console.error("Invalid transaction type:", data.parsedTransaction.type);
-        onError("Invalid transaction type received from API");
-        return;
+      if (data.parsedTransaction) {
+        onTransactionComplete(data.parsedTransaction);
       }
-
-      onTransactionComplete(data.parsedTransaction);
     } catch (error) {
-      console.error('Error sending audio to API:', error);
-      onError(`Failed to transcribe audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Error processing audio:', error);
+      onError('Error processing audio');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      await startRecording();
     }
   };
 
   return (
-    <Button
-      onClick={toggleRecording}
-      className={`p-2 ${isRecording ? 'bg-red-500' : 'bg-primary'} text-primary-foreground hover:bg-primary/90`}
-    >
-      {isRecording ? <Square className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
-    </Button>
+    <div className="flex flex-col items-center">
+      <Button
+        onClick={toggleRecording}
+        disabled={isProcessing}
+        variant="ghost"
+        data-testid="mic-button"
+        className={`
+          relative w-12 h-12 p-0 rounded-full transition-all duration-300 shadow-lg
+          flex items-center justify-center
+          ${isRecording ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-blue-500 hover:bg-blue-600'}
+          ${isProcessing ? 'bg-gray-400' : ''}
+          transform hover:scale-105 active:scale-95
+        `}
+      >
+        <div className="absolute inset-0 flex items-center justify-center">
+          {isProcessing ? (
+            <Loader2 className="h-5 w-5 animate-spin text-white" />
+          ) : isRecording ? (
+            <Square className="h-5 w-5 text-white" />
+          ) : (
+            <Mic className="h-5 w-5 text-white" />
+          )}
+        </div>
+      </Button>
+      <p className="text-sm font-medium text-gray-600 mt-2">
+        {isProcessing ? 'Processing...' : 
+         isRecording ? 'Listening...' : 
+         'Tap to speak'}
+      </p>
+    </div>
   );
 };
 
