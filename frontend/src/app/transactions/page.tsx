@@ -1,12 +1,18 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import TransactionForm from '../components/Dashboard/TransactionForm'
-import TransactionList from '../components/Dashboard/TransactionList'
-import CategoryFilter from '../components/Dashboard/CategoryFilter'
-import AudioRecorder from '../components/Dashboard/AudioRecorder'
-import { Card, CardContent } from "@/components/ui/card"
+import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import TransactionForm from "../components/Dashboard/TransactionForm";
+import TransactionList from "../components/Dashboard/TransactionList";
+import CategoryFilter from "../components/Dashboard/CategoryFilter";
+import AudioRecorder from "../components/Dashboard/AudioRecorder";
+import { Card, CardContent } from "@/components/ui/card";
 import Layout from "../layout/index";
+import { useCreateTransaction, useDeleteTransaction, useTransaction } from "../hooks/transactions";
+import { Transaction } from "../interface";
+import { AuthContext } from "../context";
+import { useCategory } from "../hooks/category";
+import { Category } from "../interface";
+import swal from "sweetalert";
 import { 
   Utensils, 
   Bus, 
@@ -56,10 +62,33 @@ const categoryIcons = {
 } as const
 
 export default function DashboardPage() {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([])
-  const [balance, setBalance] = useState(0)
-  const [categoryFilter, setCategoryFilter] = useState('All')
+	const [filteredTransactions, setFilteredTransactions] = useState<
+		Transaction[]
+	>([]);
+	const [balance, setBalance] = useState(0);
+	const [categoryFilter, setCategoryFilter] = useState("All");
+	const categories: Category[] = useCategory();
+
+	const { user } = useContext(AuthContext);
+
+	const { mutate, isSuccess, isError, error, reset } = useCreateTransaction();
+
+	const { mutate: del} = useDeleteTransaction();
+
+	const trans = useTransaction();
+
+// Memoize the transactions based on user.id, avoiding unnecessary recomputations
+	const transactions = useMemo(() => {
+		return trans?.filter((t) => t?.user_id === user?.id) || [];
+	}, [user?.id, trans]);
+
+	useEffect(() => {
+    const newBalance = transactions?.reduce((acc, transaction) => {
+      const change = parseFloat(transaction.amount);
+      return transaction.transaction_type === "income" ? acc + change : acc - change;
+    }, 0) || 0;
+    setBalance(newBalance);
+  }, [transactions]);
   const [isScanning, setIsScanning] = useState(false);
 
   // Hotkeys setup
@@ -74,51 +103,52 @@ export default function DashboardPage() {
   }, { preventDefault: true });
 
   useEffect(() => {
-    console.log('Recalculating balance. Current transactions:', transactions);
-    const newBalance = transactions.reduce((acc, transaction) => {
-      console.log(`Processing transaction:`, transaction);
-      const change = transaction.type === 'expense' ? -transaction.amount : transaction.amount;
-      console.log(`Change to balance: ${change}`);
-      return acc + change;
-    }, 0)
-    console.log(`New balance calculated: ${newBalance}`);
-    setBalance(newBalance)
+    const updateFilteredTransactions = () => {
+      if (categoryFilter === "All") {
+        setFilteredTransactions(transactions || []);
+      } else {
+				const category = categories?.find(c =>c?.name === categoryFilter)
+				setFilteredTransactions(transactions?.filter((t) => t.categories_id === category.id) || []);
+      }
+    };
+    updateFilteredTransactions();
+  }, [categoryFilter, transactions]);
 
-    if (categoryFilter === 'All') {
-      setFilteredTransactions(transactions)
-    } else {
-      setFilteredTransactions(transactions.filter(t => t.category === categoryFilter))
-    }
-  }, [transactions, categoryFilter])
+	console.log(transactions)
 
-  const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
-    const newTransaction: Transaction = {
-      ...transaction,
-      id: Date.now(),
-      date: transaction.date || new Date().toISOString().split('T')[0],
-      timestamp: transaction.timestamp || new Date().toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
-      })
-    }
-    console.log('Adding new transaction:', newTransaction);
-    setTransactions(prev => [newTransaction, ...prev])
-  }
+  const addTransaction = useCallback((transaction: Transaction) => {
+    const newTransaction = { ...transaction, amount: transaction?.amount?.toString() };
+    mutate(newTransaction);
+  }, [mutate]);
 
-  const deleteTransaction = (id: number) => {
-    console.log(`Deleting transaction with id: ${id}`);
-    setTransactions(prev => prev.filter(t => t.id !== id))
-  }
+	const deleteTransaction = (id: number) => {
+		swal({
+			title: "Are you sure?",
+			text: "Once deleted, you will not be able to recover this",
+			icon: "warning",
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			//    @ts-expect-error
+			buttons: true,
+			dangerMode: true,
+		  }).then((willDelete) => {
+			if (willDelete) {
+			  // mutateDelete(res.ID);
+			  del(id);
+						}
+		  });
+		// setTransactions((prev) => prev.filter((t) => t.id !== id));
+	};
 
-  const handleTransactionComplete = (parsedTransaction: Omit<Transaction, 'id'>) => {
-    console.log('Received parsed transaction from audio:', parsedTransaction);
-    addTransaction(parsedTransaction)
-  }
+	const handleTransactionComplete = (
+		parsedTransaction: Omit<Transaction, "id">,
+	) => {
+		console.log("Received parsed transaction from audio:", parsedTransaction);
+		addTransaction(parsedTransaction);
+	};
 
-  const handleAudioError = (error: string) => {
-    console.error("Audio recording error:", error)
-  }
+	const handleAudioError = (error: string) => {
+		console.error("Audio recording error:", error);
+	};
 
   // Receipt scanning
   const handleReceiptUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,14 +300,14 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="w-full md:w-2/3 space-y-6">
-          <CategoryFilter onCategoryChange={setCategoryFilter} />
-          <TransactionList 
-            transactions={filteredTransactions} 
-            onDeleteTransaction={deleteTransaction} 
-          />
-        </div>
-      </div>
-    </Layout>
-  )
+				<div className='w-full md:w-2/3 space-y-6'>
+					<CategoryFilter onCategoryChange={setCategoryFilter} />
+					<TransactionList
+						transactions={filteredTransactions}
+						onDeleteTransaction={deleteTransaction}
+					/>
+				</div>
+			</div>
+		</Layout>
+	);
 }

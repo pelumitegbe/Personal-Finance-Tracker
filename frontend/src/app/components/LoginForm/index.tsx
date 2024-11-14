@@ -2,12 +2,13 @@ import React from "react";
 import { LoginFormProps } from "../../interface/form";
 import { LoginProps } from "../../interface";
 import { useLogin } from "../../hooks/auth";
+import FormInput from "../../components/FormInput";
 import { useIsMutating } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
 
 export const LoginForm: React.FC<LoginFormProps> = ({ setIsLogin }) => {
   const [formData, setFormData] = React.useState<LoginProps>({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -30,16 +31,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ setIsLogin }) => {
     <div className="formContainer">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <input
+        <FormInput
           type="text"
           placeholder="Email"
           name="email"
+          value={formData?.email}
           onChange={handleChange}
         />
-        <input
+        <FormInput
           type="password"
           placeholder="Password"
           name="password"
+          value={formData?.password}
           onChange={handleChange}
         />
         <button type="submit">

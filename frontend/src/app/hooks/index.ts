@@ -3,10 +3,7 @@ import { axiosInstance } from "../axios-Instance";
 import { queryKeys } from "../react-query/constants";
 import { getLoginToken } from "../storage";
 import { useLogin, useRegister } from "./auth";
-import { toastOptions } from "../utils";
-import { toast } from "react-toastify";
-
-const SERVER_ERROR = "There was an error contacting the server.";
+import { errorAlert, ErrorResponse } from "../utils";
 
 export const hooks = {
   useLogin,
@@ -19,7 +16,7 @@ async function getMe() {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getLoginToken()}`,
+      "token": `${getLoginToken()}`,
     },
   });
 
@@ -28,16 +25,12 @@ async function getMe() {
 
 export function useGetMe() {
   const fallback = {};
-  const { data = fallback } = useQuery({
+  const { data = fallback, isError, error } = useQuery<unknown, ErrorResponse>({
     queryKey: [queryKeys.user],
     queryFn: () => getMe(),
-    onSuccess: () => {},
-    onError: (error: any) => {
-      const err = error?.response?.data?.error
-        ? error?.response?.data?.error
-        : SERVER_ERROR;
-      toast.error(err, toastOptions);
-    },
   });
+  if (isError){
+    errorAlert(error)
+  }
   return data;
 }

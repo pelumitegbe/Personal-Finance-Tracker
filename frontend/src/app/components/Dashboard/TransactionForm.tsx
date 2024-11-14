@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCategory } from "../../hooks/category";
+import { Category } from "../../interface";
 import { Camera, Loader2, Receipt } from 'lucide-react';
 import { 
   Tooltip, 
@@ -22,38 +24,49 @@ interface TransactionFormProps {
   onAddTransaction: (transaction: {
     description: string;
     amount: number;
-    type: 'income' | 'expense';
+    transaction_type: 'income' | 'expense';
     category: string;
   }) => void;
   onReceiptUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   isScanning: boolean;
 }
 
-const categories = [
-  "Food", "Transportation", "Housing", "Utilities", "Entertainment", "Healthcare", "Education", "Other"
-];
+// const categories = [
+// 	"Food",
+// 	"Transportation",
+// 	"Housing",
+// 	"Utilities",
+// 	"Entertainment",
+// 	"Healthcare",
+// 	"Education",
+// 	"Other",
+// ];
 
-export default function TransactionForm({ onAddTransaction, onReceiptUpload, isScanning }: TransactionFormProps) {
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState<'income' | 'expense'>('expense');
-  const [category, setCategory] = useState("Other");
+export default function TransactionForm({
+	onAddTransaction, onReceiptUpload, isScanning,
+}: TransactionFormProps) {
+	const [description, setDescription] = useState("");
+	const [amount, setAmount] = useState("");
+	const [transaction_type, setType] = useState<"income" | "expense">("expense");
+	const [category, setCategory] = useState("Other");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (description && amount) {
-      onAddTransaction({
-        description,
-        amount: parseFloat(amount),
-        type,
-        category,
-      });
-      setDescription("");
-      setAmount("");
-      setType('expense');
-      setCategory("Other");
-    }
-  };
+	const categories: Category[] = useCategory();
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (description && amount) {
+			onAddTransaction({
+				description,
+				amount: parseFloat(amount),
+				transaction_type,
+				category,
+			});
+			setDescription("");
+			setAmount("");
+			setType("expense");
+			setCategory("Other");
+		}
+	};
 
   return (
     <Card className="bg-white border-2 border-black rounded-lg overflow-hidden">
@@ -125,8 +138,8 @@ export default function TransactionForm({ onAddTransaction, onReceiptUpload, isS
             />
           </div>
           <div>
-            <Label htmlFor="type" className="font-semibold">Type</Label>
-            <Select value={type} onValueChange={(value: 'income' | 'expense') => setType(value)}>
+            <Label htmlFor="transaction_type" className="font-semibold">Type</Label>
+            <Select value={transaction_type} onValueChange={(value: 'income' | 'expense') => setType(value)}>
               <SelectTrigger className="border-2 border-black mt-1 rounded-md">
                 <SelectValue />
               </SelectTrigger>
@@ -142,11 +155,15 @@ export default function TransactionForm({ onAddTransaction, onReceiptUpload, isS
               <SelectTrigger className="border-2 border-black mt-1 rounded-md">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border-2 border-black rounded-md shadow-lg">
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
+              <SelectContent className='bg-white border-2 border-grey rounded-md shadow-lg'>
+								{categories?.map((cat: Category) => (
+									<SelectItem
+										key={cat?.id}
+										value={cat?.name}>
+										{cat?.name}
+									</SelectItem>
+								))}
+							</SelectContent>
             </Select>
           </div>
           <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800 rounded-md">

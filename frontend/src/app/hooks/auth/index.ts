@@ -43,8 +43,8 @@ export function useLogin() {
   const { mutate, isError, error, isSuccess, reset } = useMutation({
     mutationFn: (formData: LoginProps) => userLogin(formData),
     onSuccess: (data) => {
-      setLoginToken(data.token);
-      authCtx.authenticate(data);
+      setLoginToken(data?.user?.token);
+      authCtx.authenticate(data?.user);
       successAlert("Logged in successfully");
       router.push("/dashboard");
     },
