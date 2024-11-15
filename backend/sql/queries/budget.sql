@@ -1,7 +1,7 @@
 -- name: CreateBudget :one
 INSERT INTO budget (
-  id,user_id,amount,start_date,end_date,created_at,updated_at
-) VALUES ( $1,$2,$3,$4,$5,$6,$7 )
+  id,user_id,amount,start_date,valid,end_date,created_at,updated_at
+) VALUES ( $1,$2,$3,$4,$5,$6,$7,$8 )
 RETURNING *;
 
 -- name: UpdateBudget :one

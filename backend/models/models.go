@@ -67,13 +67,23 @@ type Balance struct {
 }
 
 type Budget struct {
-	ID          uuid.UUID `json:"id,omitempty"`
-	UserID      uuid.UUID `json:"user_id,omitempty"`
-	Amount      string    `json:"amount,omitempty"`
-	SpentAmount string    `json:"spent_amount,omitempty"`
-	Valid       bool      `json:"valid,omitempty"`
-	StartDate   time.Time `json:"start_date,omitempty"`
-	EndDate     time.Time `json:"end_date,omitempty"`
+	Amount      string    `json:"amount,omitempty"       validate:"required"`
+	SpentAmount string    `json:"spent_amount,omitempty" validate:"required"`
+	StartDate   time.Time `json:"start_date,omitempty"   validate:"required"`
+	EndDate     time.Time `json:"end_date,omitempty"     validate:"required"`
 	Created_At  time.Time `json:"created_at,omitempty"`
 	Updated_At  time.Time `json:"updated_at,omitempty"`
 }
+
+/* type BudgetResponse struct {
+	ID              uuid.UUID `json:"id,omitempty"`
+	UserID          uuid.UUID `json:"user_id,omitempty"`
+	Amount          string    `json:"amount,omitempty"           validate:"required"`
+	SpentAmount     string    `json:"spent_amount,omitempty"     validate:"required"`
+	RemainingAmount string    `json:"remaining_amount,omitempty"`
+	SpentPrecentage string    `json:"spent_precentage,omitempty"`
+	StartDate       time.Time `json:"start_date,omitempty"       validate:"required"`
+	EndDate         time.Time `json:"end_date,omitempty"         validate:"required"`
+	Created_At      time.Time `json:"created_at,omitempty"`
+	Updated_At      time.Time `json:"updated_at,omitempty"`
+} */
