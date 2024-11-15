@@ -88,6 +88,10 @@ func createTransactionsResponse(data interface{}) models.TransactionResponse {
 	}
 }
 
+/* func createBudgetResponse(data interface{}) {
+	return
+}
+*/
 // convert string to NullString
 func ToNullString(s string) sql.NullString {
 	if s == "" {

@@ -14,8 +14,8 @@ import (
 
 const createBudget = `-- name: CreateBudget :one
 INSERT INTO budget (
-  id,user_id,amount,start_date,end_date,created_at,updated_at
-) VALUES ( $1,$2,$3,$4,$5,$6,$7 )
+  id,user_id,amount,start_date,valid,end_date,created_at,updated_at
+) VALUES ( $1,$2,$3,$4,$5,$6,$7,$8 )
 RETURNING id, user_id, amount, spent_amount, remaining_amount, spent_percentage, valid, start_date, end_date, created_at, updated_at
 `
 
@@ -24,6 +24,7 @@ type CreateBudgetParams struct {
 	UserID    uuid.UUID `json:"user_id"`
 	Amount    string    `json:"amount"`
 	StartDate time.Time `json:"start_date"`
+	Valid     bool      `json:"valid"`
 	EndDate   time.Time `json:"end_date"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -35,6 +36,7 @@ func (q *Queries) CreateBudget(ctx context.Context, arg CreateBudgetParams) (Bud
 		arg.UserID,
 		arg.Amount,
 		arg.StartDate,
+		arg.Valid,
 		arg.EndDate,
 		arg.CreatedAt,
 		arg.UpdatedAt,
