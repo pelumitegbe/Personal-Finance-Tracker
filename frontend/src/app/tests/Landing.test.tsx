@@ -2,7 +2,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Landing from "../page.tsx";
+import Landing from "../page";
 
 // Mock TopNavigation component
 jest.mock("../components/TopNavigation", () => {
