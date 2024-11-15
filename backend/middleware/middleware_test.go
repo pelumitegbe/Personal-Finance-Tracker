@@ -5,15 +5,12 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-
 	"github.com/gin-gonic/gin"
-
 	"github.com/pelumitegbe/Personal-Finance-Tracker/tokens"
 )
 
 func TestAuthentication(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-
 	// Mock a function to generate a valid access token
 	validToken, _ := tokens.GenerateAccessToken(
 		"test@example.com",
@@ -32,7 +29,6 @@ func TestAuthentication(t *testing.T) {
 		"12345",
 		"user",
 	)
-
 	tests := []struct {
 		name           string
 		token          string
@@ -63,7 +59,6 @@ func TestAuthentication(t *testing.T) {
 			r.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{"message": "Authorized"})
 			})
-
 			// Create a test request with the specified token
 			req, _ := http.NewRequest("GET", "/test", nil)
 			if tt.token != "" {
@@ -73,7 +68,6 @@ func TestAuthentication(t *testing.T) {
 
 			// Perform the test request
 			r.ServeHTTP(w, req)
-
 			// Assert the response status and error message
 			if w.Code != tt.expectedStatus {
 				t.Errorf("Expected status %d, but got %d", tt.expectedStatus, w.Code)
@@ -91,7 +85,6 @@ func TestAuthentication(t *testing.T) {
 
 func TestAdminAuthorization(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-
 	tests := []struct {
 		name           string
 		role           interface{}
@@ -102,7 +95,6 @@ func TestAdminAuthorization(t *testing.T) {
 		{"Non-Admin Role", "user", http.StatusUnauthorized, "You are not authorized"},
 		{"Admin Role", "admin", http.StatusOK, ""},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set up the Gin router with the AdminAuthorization middleware
@@ -116,7 +108,6 @@ func TestAdminAuthorization(t *testing.T) {
 			r.GET("/admin", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{"message": "Authorized as admin"})
 			})
-
 			// Create a test request
 			req, _ := http.NewRequest("GET", "/admin", nil)
 			w := httptest.NewRecorder()
