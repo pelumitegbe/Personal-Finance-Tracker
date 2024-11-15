@@ -33,6 +33,6 @@ func UserRoutes(incomingRoutes *gin.Engine, db *database.Queries) {
 		authRoutes.GET("/auth/me", controllers.GetUserprofile(db))
 		authRoutes.DELETE("/users/transactions/:id", controllers.DeleteTransactions(db))
 		authRoutes.PATCH("/users/transactions/:id", controllers.EditTransactions(db))
-
+		authRoutes.POST("/users/budget", controllers.CreateBudget(db))
 	}
 }
