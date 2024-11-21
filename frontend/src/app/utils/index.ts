@@ -26,10 +26,11 @@ export const isAuthenticated = () => {
     }
     return false;
   } catch (e) {
-    console.log(e)
+    console.log(e);
     return false;
   }
 };
+
 
 export const toastOptions = {
   position: "top-right" as ToastPosition,

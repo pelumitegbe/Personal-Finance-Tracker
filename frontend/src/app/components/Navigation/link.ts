@@ -8,18 +8,18 @@ export const adminLinks = [
     route: "/dashboard",
     name: "Dashboard",
     Icon: RxDashboard,
-    allowed: ["Super Admin", "User", "Admin"],
+    allowed: ["user", "admin"],
   },
   {
     route: "/transactions",
     name: "Transactions",
     Icon: FaPiggyBank,
-    allowed: ["Super Admin", "User", "Admin"],
+    allowed: ["user", "admin"],
   },
   {
     route: "/account",
     name: "Account",
     Icon: MdOutlineAccountCircle,
-    allowed: ["Super Admin", "User", "Admin"],
+    allowed: ["user", "admin"],
   },
 ];

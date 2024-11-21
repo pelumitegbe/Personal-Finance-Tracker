@@ -1,20 +1,19 @@
-"use client"
+"use client";
 
 import React, { useContext, useState } from "react";
 import style from "./index.module.css";
 import swal from "sweetalert";
-import {AuthContext} from "../context";
+import { AuthContext } from "../context";
 import FormInput from "../components/FormInput";
 import Layout from "../layout/index";
 
-
 const ContactSupport = () => {
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [formData, setFormdata] = useState({
-first_name: user?.first_name,
-last_name: user?.last_name,
-username: user?.username,
-email: user?.email,
+    first_name: user?.first_name,
+    last_name: user?.last_name,
+    username: user?.username,
+    email: user?.email,
   } as any);
   console.log(user);
 
@@ -43,11 +42,12 @@ email: user?.email,
 
   return (
     <Layout name="Account" pageTitle="Account">
-    <div className={style.account}>
+      <div className={style.account}>
         <p>Your account details</p>
         <form onSubmit={handleSubmit}>
           <div className={style.personalDet}>
             <div className={style.group1}>
+              <label htmlFor="first_name">Firstname</label>
               <FormInput
                 type="text"
                 name="first_name"
@@ -57,6 +57,7 @@ email: user?.email,
               />
             </div>
             <div className={style.group1}>
+              <label htmlFor="last_name">Lastname</label>
               <FormInput
                 type="text"
                 name="last_name"
@@ -67,16 +68,18 @@ email: user?.email,
             </div>
           </div>
           <div className={style.group1}>
-          <FormInput
-          type="text"
-          placeholder="Username"
-          name="username"
-          onChange={handleChange}
-          disabled={true}
-           value={formData?.username}
-        />
+            <label htmlFor="username">Username</label>
+            <FormInput
+              type="text"
+              placeholder="Username"
+              name="username"
+              onChange={handleChange}
+              disabled={true}
+              value={formData?.username}
+            />
           </div>
           <div className={style.group1}>
+            <label htmlFor="email">Email</label>
             <FormInput
               type="email"
               name="email"
@@ -88,7 +91,7 @@ email: user?.email,
           </div>
           <button type="submit">Edit Profile</button>
         </form>
-    </div>
+      </div>
     </Layout>
   );
 };

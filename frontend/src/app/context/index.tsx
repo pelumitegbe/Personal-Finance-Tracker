@@ -3,107 +3,108 @@
 import { createContext, useEffect, useState } from "react";
 import { queryKeys } from "../react-query/constants";
 import { getLoginToken, getStoredUser, setStoredUser } from "../storage";
-import {  isAuthenticated } from "../utils";
+import { isAuthenticated } from "../utils";
 import { useAuthenticatedUser } from "./hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChildProps, userProps } from "../interface";
+import { useRouter } from "next/navigation";
 
 export const AuthContext = createContext({
-  user: undefined as userProps | undefined,
-  token: undefined as string | undefined,
-  isAuthenticated: false,
-  authenticate: (token: any) => {},
-  logout: () => {},
-  updateUser: (data: userProps) => {},
+	user: undefined as userProps | undefined,
+	token: undefined as string | undefined,
+	isAuthenticated: false,
+	authenticate: (token: any) => {},
+	logout: () => {},
+	updateUser: (data: userProps) => {},
 });
 
 function AuthContextProvider({ children }: ChildProps) {
-  const [authToken, setAuthToken] = useState<string | undefined>(undefined);
-  const [user, setUser] = useState<userProps | undefined>(undefined);
-  const userDetails = useAuthenticatedUser();
-  const queryClient = useQueryClient();
-  
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      logout();
-    }
-  }, []);
+	const [authToken, setAuthToken] = useState<string | undefined>(undefined);
+	const [user, setUser] = useState<userProps | undefined>(undefined);
+	const userDetails = useAuthenticatedUser();
+	const queryClient = useQueryClient();
+	const router = useRouter();
 
-  useEffect(() => {
-    const data = getLoginToken();
-    if (data) {
-      setAuthToken(data);
-    }
-  }, []);
+	useEffect(() => {
+		if (!isAuthenticated()) {
+			logout();
+		}
+	}, []);
 
-  useEffect(() => {
-    const data = getStoredUser();
-    if (data) {
-      setUser(data);
-    }
-  }, []);
+	useEffect(() => {
+		const data = getLoginToken();
+		if (data) {
+			setAuthToken(data);
+		}
+	}, []);
 
-  useEffect(() => {
-    if (userDetails) {
-      setUser(userDetails);
-    }
-  }, [userDetails]);
+	useEffect(() => {
+		const data = getStoredUser();
+		if (data) {
+			setUser(data);
+		}
+	}, []);
 
-  function logout() {
-    setUser(undefined);
-    setAuthToken(undefined);
-    localStorage.clear();
-    queryClient.invalidateQueries({
-      queryKey: [queryKeys.user],
-    });
-  }
-  function updateUser(data: userProps) {
-    setUser(data);
-  }
+	useEffect(() => {
+		if (userDetails) {
+			setUser(userDetails);
+		}
+	}, [userDetails]);
 
-  // function authenticate(data: string) {
-  //   setAuthToken(data);
-  //   const decoded = getDecodedJWT();
+	function logout() {
+		setUser(undefined);
+		setAuthToken(undefined);
+		localStorage.clear();
+		queryClient.removeQueries({ queryKey: [queryKeys.user] });
+		router.push("/");
+	}
+	function updateUser(data: userProps) {
+		setUser(data);
+	}
 
-  //   const userPropsObj: userProps = {
-  //     _id: decoded?._id || "",
-  //     firstname: "",
-  //     lastname: "",
-  //     middlename: "",
-  //     fullname: "",
-  //     phone: "",
-  //     email: decoded?.email || "",
-  //   };
+	// function authenticate(data: string) {
+	//   setAuthToken(data);
+	//   const decoded = getDecodedJWT();
 
-  //   setUser(userPropsObj);
-  //   setStoredUser(userPropsObj);
-  // }
-  function authenticate(data: any) {
-    setAuthToken(data.token);
+	//   const userPropsObj: userProps = {
+	//     _id: decoded?._id || "",
+	//     firstname: "",
+	//     lastname: "",
+	//     middlename: "",
+	//     fullname: "",
+	//     phone: "",
+	//     email: decoded?.email || "",
+	//   };
 
-    const userPropsObj: userProps = {
-      id: data?.id || "",
-      first_name: data?.first_name || "",
-      last_name: data?.last_name || "",
-      role: data?.role || "",
-      username: data?.username || "",
-      email: data?.email || "",
-    };
+	//   setUser(userPropsObj);
+	//   setStoredUser(userPropsObj);
+	// }
+	function authenticate(data: any) {
+		setAuthToken(data.token);
 
-    setUser(userPropsObj);
-    setStoredUser(userPropsObj);
-  }
+		const userPropsObj: userProps = {
+			id: data?.id || "",
+			first_name: data?.first_name || "",
+			last_name: data?.last_name || "",
+			role: data?.role || "",
+			username: data?.username || "",
+			email: data?.email || "",
+		};
 
-  const value = {
-    user: user,
-    token: authToken,
-    isAuthenticated: !!authToken,
-    authenticate: authenticate,
-    logout: logout,
-    updateUser: updateUser,
-  };
+		setUser(userPropsObj);
+		setStoredUser(userPropsObj);
+	}
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+	const value = {
+		user: user,
+		token: authToken,
+		isAuthenticated: !!authToken,
+		authenticate: authenticate,
+		logout: logout,
+		updateUser: updateUser,
+	};
+
+	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export default AuthContextProvider;
