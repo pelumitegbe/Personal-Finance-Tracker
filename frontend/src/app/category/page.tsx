@@ -1,7 +1,7 @@
+"use client";
 import React from "react";
 import TableContainer from "../components/TableContainer";
 import style from "./index.module.css";
-import { FormInput } from "lucide-react";
 import Layout from "../layout/index";
 import Modal from "../components/Modal";
 import { useIsMutating } from "@tanstack/react-query";
@@ -11,6 +11,8 @@ import {
 	useDeleteCategory,
 	useUpdateCategory,
 } from "../hooks/category";
+import FormInput from "../components/FormInput";
+import swal from "sweetalert";
 
 const Category = () => {
 	const data = useCategory();
@@ -23,6 +25,7 @@ const Category = () => {
 	const { mutate: mutateDelete } = useDeleteCategory();
 	const { mutate: update, isSuccess: isUpdateSuccess } = useUpdateCategory();
 
+	console.log({ data });
 	if (isUpdateSuccess) {
 		setFormData({});
 		setOpen(false);
@@ -61,7 +64,7 @@ const Category = () => {
 		},
 	];
 
-	const columns = [{ title: "Title", field: "Title" }];
+	const columns = [{ title: "Title", field: "name" }];
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({
@@ -101,17 +104,15 @@ const Category = () => {
 	};
 	return (
 		<Layout
-			name='Category'
+			name='Categories'
 			pageTitle='Category'>
-			<div className={style.account}>
-				<div className='btnContainer'>
-					<button
-						className='btn btnYellow'
-						type='button'
-						onClick={openHandler}>
-						Add Category
-					</button>
-				</div>
+			<div className={style.category}>
+				<button
+					className={style.btn}
+					type='button'
+					onClick={openHandler}>
+					Add Category
+				</button>
 
 				<TableContainer
 					data={data}
@@ -121,21 +122,19 @@ const Category = () => {
 
 				<Modal
 					isVisible={open}
-					title={edit ? "Edit" : "Add"}
-					size='lg'
+					title={edit ? "Edit Category" : "Add Category"}
+					size='md'
 					content={
-						<>
-							<form onSubmit={edit ? updateHandler : handleSubmit}>
-								<FormInput
-									type='text'
-									name='name'
-									placeholder='Name'
-									value={formData?.name}
-									onChange={handleChange}
-								/>
-								<button type='submit'>Submit</button>
-							</form>
-						</>
+						<form onSubmit={edit ? updateHandler : handleSubmit}>
+							<FormInput
+								type='text'
+								name='name'
+								placeholder='Name'
+								value={formData?.name}
+								onChange={handleChange}
+							/>
+							<button type='submit'>Submit</button>
+						</form>
 					}
 					onClose={() => setOpen(false)}
 					footer=''
