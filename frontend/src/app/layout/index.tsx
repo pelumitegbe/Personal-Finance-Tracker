@@ -1,6 +1,6 @@
+"use client";
+
 import React, { useContext, useEffect } from "react";
-// import { ToastContainer } from "react-toastify";
-// import { Header, Navigation } from "../components";
 import { AuthContext } from "../context";
 import { LayoutProps } from "../interface";
 import Navigation from "../components/Navigation";

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../axios-Instance";
-import { errorAlert, ErrorResponse } from "../utils";
+import { errorAlert, ErrorResponse, successAlert } from "../utils";
 import { queryKeys } from "../react-query/constants";
 import { getLoginToken } from "../storage";
 
@@ -66,6 +66,8 @@ export function useCreateCategory() {
     mutationFn: (formData) => addCategory(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey:[queryKeys.category]});
+      successAlert("Category created successfully");
+      reset();
     },
     onError: (error) => {
       errorAlert(error);
@@ -75,7 +77,7 @@ export function useCreateCategory() {
 }
 
 export function useCategory() {
-  const fallback = [];
+  const fallback = undefined;
   const { data = fallback } = useQuery({
     queryKey: [queryKeys.category],
     queryFn: () => getCategory(),
@@ -90,6 +92,8 @@ export function useUpdateCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.category]});
+      successAlert("Category updated successfully");
+      reset();
     },
     onError: (error) => {
       errorAlert(error);
@@ -104,6 +108,8 @@ export function useDeleteCategory() {
     mutationFn: (formData) => deleteCategory(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: [queryKeys.category]});
+      successAlert("Category deleted successfully");
+      reset();
     },
     onError: (error) => {
       errorAlert(error);

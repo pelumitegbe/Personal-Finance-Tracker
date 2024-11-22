@@ -1,6 +1,6 @@
 import { FaPiggyBank } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
-import { MdOutlineAccountCircle } from "react-icons/md";
+import { MdOutlineAccountCircle, MdOutlineCategory } from "react-icons/md";
 
 
 export const adminLinks = [
@@ -15,6 +15,12 @@ export const adminLinks = [
     name: "Transactions",
     Icon: FaPiggyBank,
     allowed: ["user", "admin"],
+  },
+  {
+    route: "/category",
+    name: "Categories",
+    Icon: MdOutlineCategory,
+    allowed: ["admin"],
   },
   {
     route: "/account",
