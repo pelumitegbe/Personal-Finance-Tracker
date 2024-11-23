@@ -6,8 +6,8 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "commonjs", // Change to commonjs for Jest
+    "moduleResolution": "node", // Change to node for Jest
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
