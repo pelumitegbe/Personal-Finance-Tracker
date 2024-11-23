@@ -49,6 +49,7 @@
   overflow: hidden;
   scroll-behavior: smooth;
   gap: 2rem;
+  justify-content: space-between;
 }
 
 .scrollButtons {

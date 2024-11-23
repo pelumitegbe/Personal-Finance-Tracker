@@ -78,7 +78,7 @@ func UpdateCategory(db *database.Queries) gin.HandlerFunc {
 					Name: category.Name,
 			}
 
-			updatedCategory, err := db.UpdateCategory(ctx, categoryData)
+			_, err := db.UpdateCategory(ctx, categoryData)
 			if err != nil {
 					c.JSON(
 							http.StatusInternalServerError,
@@ -87,7 +87,7 @@ func UpdateCategory(db *database.Queries) gin.HandlerFunc {
 					return
 			}
 
-			c.JSON(http.StatusOK, gin.H{"Success": "Category updated successfully", "Category": updatedCategory})
+			c.JSON(http.StatusOK, gin.H{"Success": "Category updated successfully"})
 	}
 }
 

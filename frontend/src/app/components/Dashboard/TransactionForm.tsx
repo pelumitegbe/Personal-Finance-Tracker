@@ -120,7 +120,7 @@ export default function TransactionForm({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="border-2 border-black mt-1 rounded-md"
+              className="border-2 border-black mt-1 rounded-md p-1"
               required
             />
           </div>
@@ -131,7 +131,7 @@ export default function TransactionForm({
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="border-2 border-black mt-1 rounded-md"
+              className="border-2 border-black mt-1 rounded-md p-1"
               required
               min="0"
               step="0.01"

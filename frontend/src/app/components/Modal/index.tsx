@@ -13,8 +13,17 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
 	if (!isVisible) return null;
 
+	const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		// Check if the click is outside the modal container
+		if (e.target === e.currentTarget) {
+			onClose();
+		}
+	};
+
 	return (
-		<div className='modal-component'>
+		<div
+			className='modal-component'
+			onClick={handleOverlayClick}>
 			<div className={`modal-container ${size}`}>
 				<div className='modal-header'>
 					<h2>{title}</h2>

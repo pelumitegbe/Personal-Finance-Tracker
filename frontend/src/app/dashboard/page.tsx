@@ -83,25 +83,29 @@ export default function DashboardPage() {
 				</div>
 				<div className='transactions'>
 					<h2>Recent Transactions</h2>{" "}
-					<div
-						className='transactionsContainer'
-						ref={scrollRef}>
-						{mostRecentTransactions?.map((d, index) => {
-							const categoryName =
-								categories?.find((c) => c.id === d.categories_id)?.name ||
-								"Unknown";
-							return (
-								<TransactionsCard
-									key={index}
-									amount={d.amount}
-									category={categoryName}
-									date={d.created_at}
-									type={d.transaction_type}
-									description={d.description?.String || ""}
-								/>
-							);
-						})}
-					</div>
+					{mostRecentTransactions?.length === 0 ? (
+						<p>No transactions to display</p>
+					) : (
+						<div
+							className='transactionsContainer'
+							ref={scrollRef}>
+							{mostRecentTransactions?.map((d, index) => {
+								const categoryName =
+									categories?.find((c) => c.id === d.categories_id)?.name ||
+									"Unknown";
+								return (
+									<TransactionsCard
+										key={index}
+										amount={d.amount}
+										category={categoryName}
+										date={d.created_at}
+										type={d.transaction_type}
+										description={d.description?.String || ""}
+									/>
+								);
+							})}
+						</div>
+					)}
 					<div className='scrollButtons'>
 						<button onClick={() => scroll("left")}>
 							<FaAngleLeft />

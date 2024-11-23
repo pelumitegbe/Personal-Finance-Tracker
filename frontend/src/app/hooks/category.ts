@@ -34,7 +34,7 @@ const getCategory = async () => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function updateCategory(formData: any) {
   const data = await axiosInstance({
-    url: `/admin/category/${formData["_id"]}`,
+    url: `/admin/category/${formData["id"]}`,
     method: "PUT",
     data: formData,
     headers: {

@@ -84,6 +84,7 @@ const Category = () => {
 		}).then((willSubmit) => {
 			if (willSubmit) {
 				mutate(formData);
+				setOpen(false);
 			}
 		});
 	};
@@ -99,13 +100,15 @@ const Category = () => {
 		}).then((willSubmit) => {
 			if (willSubmit) {
 				update(formData);
+				setEdit(false);
+				setOpen(false);
 			}
 		});
 	};
 	return (
 		<Layout
 			name='Categories'
-			pageTitle='Category'>
+			pageTitle='Manage Category'>
 			<div className={style.category}>
 				<button
 					className={style.btn}

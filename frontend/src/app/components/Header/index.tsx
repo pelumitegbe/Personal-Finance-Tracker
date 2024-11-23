@@ -22,7 +22,7 @@ const Header = ({ title, user }: headerProp) => {
         <div className={header.title}>{title}</div>
       </div>
 
-      <div className={header.search}>
+      {/* <div className={header.search}>
         <AiOutlineSearch style={{ fontSize: "20px", marginLeft: "10px" }} />
         <input
           type="text"
@@ -31,7 +31,7 @@ const Header = ({ title, user }: headerProp) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-      </div>
+      </div> */}
       <div className={header.adminNav}>
         <Image src={picture} alt="Avatar" className={header.adminImg} />
         <h4 className={header.name}>
