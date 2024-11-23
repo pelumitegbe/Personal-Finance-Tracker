@@ -25,6 +25,7 @@ const Category = () => {
 	const { mutate: mutateDelete } = useDeleteCategory();
 	const { mutate: update, isSuccess: isUpdateSuccess } = useUpdateCategory();
 
+	console.log({ data });
 	if (isUpdateSuccess) {
 		setFormData({});
 		setOpen(false);
