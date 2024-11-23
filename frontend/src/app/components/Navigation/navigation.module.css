@@ -78,6 +78,7 @@
   padding: 1rem 2rem;
   /* align-items: center; */
   margin: 1rem 1rem 0.5rem 1rem;
+  border-radius: 40px;
 }
 
 .links ul li a {
@@ -117,7 +118,6 @@
 
 .links ul li:hover {
   background: rgba(233, 108, 114, 0.09);
-  border-radius: 40px;
 }
 
 .active {
@@ -126,7 +126,6 @@
 }
 .links ul .active a {
   color: rgba(200, 0, 22, 1);
-  background-color: rgba(233, 108, 114, 0.09);
   font-weight: bold;
 }
 .links ul .active span {

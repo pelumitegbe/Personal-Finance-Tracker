@@ -20,6 +20,8 @@ func UserRoutes(incomingRoutes *gin.Engine, db *database.Queries) {
 	adminRoutes.Use(middleware.AdminAuthorizaton())
 	{
 		adminRoutes.POST("/category", controllers.CreateCategory(db))
+		adminRoutes.PUT("/category/:id", controllers.UpdateCategory(db))
+		adminRoutes.DELETE("/category/:id", controllers.DeleteCategory(db))
 	}
 
 	// auth routes

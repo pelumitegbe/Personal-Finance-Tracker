@@ -68,3 +68,33 @@ func (q *Queries) GetCategory(ctx context.Context, name string) (Category, error
 	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
 	return i, err
 }
+
+const updateCategory = `-- name: UpdateCategory :exec
+UPDATE category
+SET name = $2
+WHERE id = $1
+RETURNING id, name, created_at;
+`
+
+type UpdateCategoryParams struct {
+    ID   uuid.UUID `json:"id"`
+    Name string    `json:"name"`
+}
+
+func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
+    row := q.db.QueryRowContext(ctx, updateCategory, arg.ID, arg.Name)
+    var i Category
+    err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
+    return i, err
+}
+
+
+const deleteCategory = `-- name: DeleteCategory :exec
+DELETE FROM category
+WHERE id = $1;
+`
+
+func (q *Queries) DeleteCategory(ctx context.Context, id uuid.UUID) error {
+    _, err := q.db.ExecContext(ctx, deleteCategory, id)
+    return err
+}
