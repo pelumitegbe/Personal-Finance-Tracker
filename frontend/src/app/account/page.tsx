@@ -90,7 +90,7 @@ const ContactSupport = () => {
 							disabled={true}
 						/>
 					</div>
-					<button type='submit'>Edit Profile</button>
+					{/* <button type='submit'>Edit Profile</button> */}
 				</form>
 			</div>
 		</Layout>
