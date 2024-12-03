@@ -118,7 +118,42 @@
 	height: 1rem;
 	background: #28a745;
 	transition: width 0.3s ease;
+	border-radius: 5px;
 }
 .progressBarContainer .progressBar.red {
 	background: #28a745;
+}
+
+.categorizedBudgetSection {
+	display: flex;
+	width: 100%;
+	flex-basis: 65%;
+	background: white;
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+	padding: 2rem;
+	border-radius: 10px;
+	flex-direction: column;
+}
+
+.chartContainer {
+	margin-top: 20px;
+}
+
+.categoriesTable {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+}
+
+.categoryRow {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	flex: 1;
+	min-width: 200px;
+}
+.dashboard .budgetDivision {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
 }
