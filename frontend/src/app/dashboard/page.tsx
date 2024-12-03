@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useContext, useMemo } from "react";
+import React, { useRef, useContext, useMemo, useState } from "react";
 import Layout from "../layout/index";
 import TransactionsChart from "../components/TransactionsChart";
 import { FaHandHoldingDollar } from "react-icons/fa6";
@@ -17,6 +17,14 @@ import { Category } from "../interface";
 
 export default function DashboardPage() {
 	const { user } = useContext(AuthContext);
+	const trans = useTransaction();
+
+	const categories: Category[] = useCategory();
+
+	// Memoize the transactions based on user.id, avoiding unnecessary recomputations
+	const transactions = useMemo(() => {
+		return trans?.filter((t) => t?.user_id === user?.id) || [];
+	}, [user?.id, trans]);
 
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const scroll = (direction: string) => {
@@ -30,16 +38,67 @@ export default function DashboardPage() {
 		}
 	};
 
-	const trans = useTransaction();
+	const staticBudgets = [
+		{
+			id: 1,
+			name: "Groceries",
+			amount: 200,
+			startDate: "2024-12-01",
+			endDate: "2024-12-31",
+		},
+		{
+			id: 2,
+			name: "Transport",
+			amount: 100,
+			startDate: "2024-12-01",
+			endDate: "2024-12-31",
+		},
+		{
+			id: 3,
+			name: "Entertainment",
+			amount: 150,
+			startDate: "2024-12-01",
+			endDate: "2024-12-31",
+		},
+	];
 
-	const categories: Category[] = useCategory();
+	// Function to check if today's date falls within the budget period
+	const isBudgetActive = (startDate: string, endDate: string): boolean => {
+		const today = new Date();
+		const start = new Date(startDate);
+		const end = new Date(endDate);
+		return today >= start && today <= end;
+	};
+	// Find the active budget based on today's date
+	const getActiveBudget = () => {
+		return staticBudgets?.find((budget) =>
+			isBudgetActive(budget.startDate, budget.endDate),
+		);
+	};
 
-	// Memoize the transactions based on user.id, avoiding unnecessary recomputations
-	const transactions = useMemo(() => {
-		return trans?.filter((t) => t?.user_id === user?.id) || [];
-	}, [user?.id, trans]);
+	const activeBudget = getActiveBudget();
+
+	// Calculate total income, expenses, and balance
+	const totalIncome = transactions
+		.filter((t) => t.transaction_type === "income")
+		.reduce((sum, t) => sum + parseFloat(t?.amount), 0);
+	const totalExpenses = transactions
+		.filter((t) => t.transaction_type === "expense")
+		.reduce((sum, t) => sum + parseFloat(t?.amount), 0);
+
+	const currentBalance = totalIncome - totalExpenses;
+
+	// Calculate remaining budget and progress for the active budget
+	const spentBudget = totalExpenses;
+	const remainingBudget = activeBudget ? activeBudget.amount - spentBudget : 0;
+	const budgetProgress = activeBudget
+		? (spentBudget / activeBudget.amount) * 100
+		: 0;
 
 	console.log({ transactions });
+	console.log({ activeBudget });
+	console.log({ totalIncome });
+	console.log({ totalExpenses });
 
 	// Sort transactions by date in descending order and get the most recent 5
 	const sortedTransactions = [...transactions].sort(
@@ -120,6 +179,25 @@ export default function DashboardPage() {
 					<p>This is the visual representation of your expenses by category</p>
 					<TransactionsChart transactions={transactions || []} />
 				</div>
+				{activeBudget && (
+					<div className='generalBudgetProgress'>
+						<h3>Active Budget Progress</h3> <p>Budget: ${activeBudget.amount}</p>{" "}
+						<p>Spent: ${spentBudget}</p> <p>Remaining: ${remainingBudget}</p>{" "}
+						<div className='progressBarContainer'>
+							<div
+								className='progressBar'
+								style={{
+									width: `${budgetProgress}%`,
+									backgroundColor: budgetProgress > 100 ? "red" : "green",
+								}}></div>
+						</div>
+					</div>
+				)}
+				{!activeBudget && (
+					<div className='generalBudgetProgress'>
+						<h3>No Active Budget</h3>
+					</div>
+				)}
 			</div>
 		</Layout>
 	);

@@ -15,8 +15,6 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({ category, amount, da
     timeZone: 'UTC'
   }).format(new Date(date));
 
-  console.log({date})
-
   return (
     <div className={`${styles.transactionCard} ${transactionStyle}`}>
         <h1>{category}</h1>

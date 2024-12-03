@@ -1,0 +1,16 @@
+.budget {
+  display: flex;
+  background: white;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  gap: 2rem;
+  border-radius: 20px;
+}
+.budget .btn{
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(200, 0, 22, 1);
+  color: white;
+  width: fit-content;
+}

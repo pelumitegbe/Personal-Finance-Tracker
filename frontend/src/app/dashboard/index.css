@@ -1,91 +1,124 @@
 .dashboard {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  flex-direction: column;
+	display: flex;
+	gap: 2rem;
+	justify-content: center;
+	flex-direction: column;
 }
 
 .dashboard .cardFlex {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-  gap: 2.5rem;
-  justify-content: space-between;
+	display: flex;
+	width: 100%;
+	flex-wrap: wrap;
+	gap: 2.5rem;
+	justify-content: space-between;
 }
 
 .dashboard .chart {
-  display: flex;
-  width: 100%;
-  flex-basis: 65%;
-  background: white;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  padding: 2rem;
-  border-radius: 10px;
-  flex-direction: column;
+	display: flex;
+	width: 100%;
+	flex-basis: 65%;
+	background: white;
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+	padding: 2rem;
+	border-radius: 10px;
+	flex-direction: column;
 }
 
 .dashboard .chart h3 {
-  margin-bottom: 0.5rem;
+	margin-bottom: 0.5rem;
 }
 
 .dashboard .chart p {
-  font-size: 12px;
-  margin-bottom: 0.5rem;
+	font-size: 12px;
+	margin-bottom: 0.5rem;
 }
 
 .dashboard .transactions {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 2rem;
-  border-radius: 10px;
-  background: white;
-  position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 2rem;
+	border-radius: 10px;
+	background: white;
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+	position: relative;
 }
 
 .dashboard .transactionsContainer {
-  border-radius: 10px;
-  display: flex;
-  overflow: hidden;
-  scroll-behavior: smooth;
-  gap: 2rem;
-  justify-content: space-between;
+	border-radius: 10px;
+	display: flex;
+	overflow: hidden;
+	scroll-behavior: smooth;
+	gap: 2rem;
+	justify-content: space-between;
 }
 
 .scrollButtons {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
 }
 
 .scrollButtons button {
-  position: absolute;
-  top: 50%;
-  background: #ffc6d2;
-  padding: 0.5rem 1rem;
-  border-radius: 50%;
-  cursor: pointer;
-  color: white;
-  height: 50px;
-  width: 50px;
-  transition: background 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	position: absolute;
+	top: 50%;
+	background: #ffc6d2;
+	padding: 0.5rem 1rem;
+	border-radius: 50%;
+	cursor: pointer;
+	color: white;
+	height: 50px;
+	width: 50px;
+	transition: background 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .scrollButtons button svg {
-  font-size: 25px;
+	font-size: 25px;
 }
 
 .scrollButtons button:first-child {
-  left: 1%;
+	left: 1%;
 }
 
 .scrollButtons button:last-child {
-  right: 2%;
+	right: 2%;
 }
 
 .scrollButtons button:hover {
-  background: #f0f0f0;
+	background: #f0f0f0;
+}
+
+.generalBudgetProgress {
+	display: flex;
+	width: 100%;
+	background: white;
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+	padding: 2rem;
+	border-radius: 10px;
+	flex-direction: column;
+	justify-content: center;
+	gap: 1rem;
+}
+
+.generalBudgetProgress h3 {
+	margin-bottom: 1rem;
+}
+
+.progressBarContainer {
+	width: 100%;
+	background: #e0e0e0;
+	border-radius: 5px;
+	overflow: hidden;
+	margin-top: 1rem;
+}
+.progressBar {
+	height: 1rem;
+	background: #28a745;
+	transition: width 0.3s ease;
+}
+.progressBarContainer .progressBar.red {
+	background: #28a745;
 }
