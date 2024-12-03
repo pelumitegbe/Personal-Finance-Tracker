@@ -6,7 +6,6 @@ import Layout from "../layout/index";
 import Modal from "../components/Modal";
 import { useIsMutating } from "@tanstack/react-query";
 import {
-	useBudget,
 	useCreateBudget,
 	useDeleteBudget,
 	useUpdateBudget,
@@ -15,8 +14,6 @@ import FormInput from "../components/FormInput";
 import swal from "sweetalert";
 
 const Budget = () => {
-	// const data = useBudget();
-
 	const staticBudgets = [
 		{
 			id: 1,
@@ -40,6 +37,7 @@ const Budget = () => {
 			endDate: "2024-12-31",
 		},
 	];
+
 	const [data, setData] = React.useState(staticBudgets);
 	const isLoading = useIsMutating();
 	const [open, setOpen] = React.useState(false);
@@ -106,43 +104,80 @@ const Budget = () => {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		swal({
-			title: "Confirmation",
-			text: "Are you sure you want to submit this?",
-			icon: "warning",
-			buttons: ["Cancel", "Submit"],
-			dangerMode: true,
-		}).then((willSubmit) => {
-			if (willSubmit) {
-				const newBudget = { ...formData, id: data.length + 1 };
-				setData([...data, newBudget]);
-				setOpen(false);
-			}
+		const startDate = new Date(formData.startDate);
+		const endDate = new Date(formData.endDate);
+
+		// Check for overlapping budgets
+		const isOverlapping = data.some((budget) => {
+			const existingStart = new Date(budget.startDate);
+			const existingEnd = new Date(budget.endDate);
+			return startDate <= existingEnd && endDate >= existingStart;
 		});
+
+		if (isOverlapping) {
+			swal({
+				title: "Error",
+				text: "Cannot create a budget that overlaps with an existing budget.",
+				icon: "error",
+				buttons: ["OK"],
+			});
+		} else {
+			swal({
+				title: "Confirmation",
+				text: "Are you sure you want to submit this?",
+				icon: "warning",
+				buttons: ["Cancel", "Submit"],
+				dangerMode: true,
+			}).then((willSubmit) => {
+				if (willSubmit) {
+					const newBudget = { ...formData, id: data.length + 1 };
+					setData([...data, newBudget]);
+					setOpen(false);
+				}
+			});
+		}
 	};
 
 	const updateHandler = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		swal({
-			title: "Confirmation",
-			text: "Are you sure you want to edit this?",
-			icon: "warning",
-			buttons: ["Cancel", "Submit"],
-			dangerMode: true,
-		}).then((willSubmit) => {
-			if (willSubmit) {
-				// update(formData);
-				// setEdit(false);
-				// setOpen(false);
-				const updatedData = data.map((item) =>
-					item.id === formData.id ? formData : item,
-				);
-				setData(updatedData);
-				setEdit(false);
-				setOpen(false);
-			}
+		const startDate = new Date(formData.startDate);
+		const endDate = new Date(formData.endDate);
+
+		// Check for overlapping budgets, ignoring the current one being edited
+		const isOverlapping = data.some((budget) => {
+			if (budget.id === formData.id) return false;
+			const existingStart = new Date(budget.startDate);
+			const existingEnd = new Date(budget.endDate);
+			return startDate <= existingEnd && endDate >= existingStart;
 		});
+
+		if (isOverlapping) {
+			swal({
+				title: "Error",
+				text: "Cannot edit a budget with dates that overlaps with an existing budget.",
+				icon: "error",
+				buttons: ["OK"],
+			});
+		} else {
+			swal({
+				title: "Confirmation",
+				text: "Are you sure you want to edit this?",
+				icon: "warning",
+				buttons: ["Cancel", "Submit"],
+				dangerMode: true,
+			}).then((willSubmit) => {
+				if (willSubmit) {
+					const updatedData = data.map((item) =>
+						item.id === formData.id ? formData : item,
+					);
+					setData(updatedData);
+					setEdit(false);
+					setOpen(false);
+				}
+			});
+		}
 	};
+
 	return (
 		<Layout
 			name='Budget'
