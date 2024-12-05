@@ -3,6 +3,8 @@ package controllers
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -86,6 +88,28 @@ func createTransactionsResponse(data interface{}) models.TransactionResponse {
 		Status: "Success",
 		Data:   data,
 	}
+}
+func createBudgetResponse(budget database.Budget) map[string]interface{} {
+	return map[string]interface{}{
+		"id":         budget.ID,
+		"user_id":    budget.UserID,
+		"amount":     budget.Amount,
+		"start_date": budget.StartDate,
+		"end_date":   budget.EndDate,
+		"valid":      budget.Valid,
+		"created_at": budget.CreatedAt,
+		"updated_at": budget.UpdatedAt,
+	}
+}
+
+func validateBudgetDates(startDate, endDate time.Time) error {
+	if startDate.Before(time.Now()) {
+		return fmt.Errorf("start date cannot be in the past")
+	}
+	if endDate.Before(startDate) {
+		return fmt.Errorf("end date must be after the start date")
+	}
+	return nil
 }
 
 /* func createBudgetResponse(data interface{}) {

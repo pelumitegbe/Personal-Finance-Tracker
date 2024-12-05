@@ -12,35 +12,33 @@ import (
 	"github.com/pelumitegbe/Personal-Finance-Tracker/models"
 )
 
+// CreateBudget handles creating a new budget
 func CreateBudget(db *database.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		// create a budget variabe
 		var budget models.Budget
 		if err := c.BindJSON(&budget); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Request body not valid"})
 			return
 		}
 
-		// check if the budget start date is in the past
+		// Validate budget dates
 		if budget.StartDate.Before(time.Now()) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Budget date cannot be in the past "})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Start date cannot be in the past"})
 			return
 		}
 
-		// get the user id from the request
-		user_id, msg := getUserIdFromRequest(c)
+		userID, msg := getUserIdFromRequest(c)
 		if msg != "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
 			return
 		}
 
-		// create budgetdata params
 		budgetData := database.CreateBudgetParams{
 			ID:        uuid.New(),
-			UserID:    user_id,
+			UserID:    userID,
 			Amount:    budget.Amount,
 			StartDate: budget.StartDate,
 			EndDate:   budget.EndDate,
@@ -51,56 +49,107 @@ func CreateBudget(db *database.Queries) gin.HandlerFunc {
 
 		finalBudget, err := db.CreateBudget(ctx, budgetData)
 		if err != nil {
-			c.JSON(
-				http.StatusInternalServerError,
-				gin.H{"error": "couldn't create and store the budget data"},
-			)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't create and store the budget data"})
 			return
 		}
 
-		c.JSON(http.StatusCreated, finalBudget)
+		// Use createBudgetResponse for consistent response format
+		c.JSON(http.StatusCreated, createBudgetResponse(finalBudget))
 	}
 }
 
-// make budget invalid so that we can delete it later
+// MakeBudgetInvalid marks a budget as invalid
 func MakeBudgetInvalid(db *database.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		bud_id := c.Param("id")
-		if bud_id == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Provide valid transaction id in the url"})
+		budID := c.Param("id")
+		if budID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Provide a valid budget ID in the URL"})
 			return
 		}
 
-		budget_id, err := uuid.Parse(bud_id)
+		budgetID, err := uuid.Parse(budID)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Provide valid transaction id in the url"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Provide a valid budget ID"})
 			return
 		}
 
-		user_id, msg := getUserIdFromRequest(c)
-		if msg == "" {
+		userID, msg := getUserIdFromRequest(c)
+		if msg != "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user"})
 			return
 		}
 
 		_, err = db.MakeBudgetInvalid(ctx, database.MakeBudgetInvalidParams{
-			ID:     budget_id,
-			UserID: user_id,
+			ID:     budgetID,
+			UserID: userID,
 		})
 		if err != nil {
-			c.JSON(
-				http.StatusInternalServerError,
-				gin.H{"error": "couldn't make the budget invalid"},
-			)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't make the budget invalid"})
 			return
 		}
 
-		c.JSON(http.StatusNoContent, map[string]interface{}{
+		c.JSON(http.StatusNoContent, gin.H{
 			"status":  "success",
-			"message": "budget successfully invalidated",
+			"message": "Budget successfully invalidated",
 		})
+	}
+}
+
+// UpdateBudget handles updating an existing budget
+func UpdateBudget(db *database.Queries) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		budID := c.Param("id")
+		if budID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Provide a valid budget ID in the URL"})
+			return
+		}
+
+		budgetID, err := uuid.Parse(budID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Provide a valid budget ID"})
+			return
+		}
+
+		var updatedBudget models.Budget
+		if err := c.BindJSON(&updatedBudget); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Request body not valid"})
+			return
+		}
+
+		userID, msg := getUserIdFromRequest(c)
+		if msg != "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
+
+		// Validate budget dates
+		if updatedBudget.StartDate.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Start date cannot be in the past"})
+			return
+		}
+
+		params := database.UpdateBudgetParams{
+			ID:        budgetID,
+			UserID:    userID,
+			Amount:    updatedBudget.Amount,
+			StartDate: updatedBudget.StartDate,
+			EndDate:   updatedBudget.EndDate,
+			UpdatedAt: time.Now(),
+		}
+
+		updatedBudgetData, err := db.UpdateBudget(ctx, params)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't update the budget"})
+			return
+		}
+
+		// Use createBudgetResponse for consistent response format
+		c.JSON(http.StatusOK, createBudgetResponse(updatedBudgetData))
 	}
 }

@@ -28,7 +28,6 @@ func UserRoutes(incomingRoutes *gin.Engine, db *database.Queries) {
 	authRoutes := incomingRoutes.Group("/")
 	authRoutes.Use(middleware.Authentication())
 	{
-
 		// user route
 		authRoutes.POST("/users/transactions", controllers.AddTransaction(db))
 		authRoutes.GET("/users/transactions", controllers.GetTransactions(db))
@@ -36,5 +35,8 @@ func UserRoutes(incomingRoutes *gin.Engine, db *database.Queries) {
 		authRoutes.DELETE("/users/transactions/:id", controllers.DeleteTransactions(db))
 		authRoutes.PATCH("/users/transactions/:id", controllers.EditTransactions(db))
 		authRoutes.POST("/users/budget", controllers.CreateBudget(db))
+
+		// Add EditBudget route
+		authRoutes.PUT("/users/budget/:id", controllers.UpdateBudget(db))
 	}
 }
