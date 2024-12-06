@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "llama-3.2-11b-text-preview",
+      model: "llama-3.1-8b-instant",
       temperature: 0.2,
       max_tokens: 1024,
       top_p: 1,
@@ -169,7 +169,10 @@ export async function POST(request: NextRequest) {
     }
 
     const parsedTransaction = {
-      ...parsedJson,
+      description: parsedJson.description,
+      amount: parsedJson.amount.toString(),
+      transaction_type: parsedJson.type,
+      category: parsedJson.category,
       date: transactionDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
