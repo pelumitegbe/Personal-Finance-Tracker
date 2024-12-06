@@ -15,6 +15,7 @@
 .customTable td {
   padding: 10px;
   border: 1px solid #ccc;
+  text-align: center;
 }
 
 .customTable thead tr {

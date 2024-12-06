@@ -4,14 +4,15 @@ import Navlinks from "./Navlinks";
 
 interface LinkProps {
   name: string;
+  role: string;
 }
-const Navigation = ({ name }: LinkProps) => {
+const Navigation = ({ name, role }: LinkProps) => {
   return (
     <div className={nav.navigation}>
       <div className={nav.logo}>
         <h2>Finance Tracker</h2>
       </div>
-      <Navlinks name={name} />
+      <Navlinks name={name} role={role}/>
     </div>
   );
 };

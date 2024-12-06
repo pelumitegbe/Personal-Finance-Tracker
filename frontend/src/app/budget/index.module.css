@@ -1,0 +1,37 @@
+.budget {
+	display: flex;
+	background: white;
+	flex-direction: column;
+	justify-content: center;
+	padding: 2rem;
+	gap: 2rem;
+	border-radius: 20px;
+}
+.budget .btn {
+	padding: 1rem;
+	border-radius: 10px;
+	background: rgba(200, 0, 22, 1);
+	color: white;
+	width: fit-content;
+}
+.budget .radio {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.budget .radio input {
+	display: flex;
+}
+.budget .dateGroup {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+.dateGroup > div {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+.dateGroup > div p {
+	font-size: 14px;
+}

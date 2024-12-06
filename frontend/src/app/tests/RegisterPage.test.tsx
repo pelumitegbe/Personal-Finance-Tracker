@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RegisterForm } from "../components/RegisterForm";
 import { useRegister } from "../hooks/auth";
 
-// Mock the `useRegister` hook
+// Mock the useRegister hook
 jest.mock("../hooks/auth", () => ({
   useRegister: jest.fn(),
 }));

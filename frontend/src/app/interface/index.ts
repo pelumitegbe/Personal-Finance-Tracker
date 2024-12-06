@@ -97,3 +97,12 @@ export interface Transaction {
   category: string
   date: string
 }
+
+export interface ModalProps {
+  isVisible: boolean;           
+  title: string;                
+  size: 'sm' | 'md' | 'lg';     
+  content: React.ReactNode;     
+  onClose: () => void;          
+  footer?: React.ReactNode;     
+}

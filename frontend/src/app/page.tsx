@@ -1,6 +1,7 @@
 "use client";
 
 import "./index.css";
+import React from "react"
 import TopNavigation from "./components/TopNavigation";
 
 export default function landing() {
