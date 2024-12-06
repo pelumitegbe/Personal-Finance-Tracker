@@ -53,17 +53,45 @@ func ProcessReceipt(db *database.Queries) gin.HandlerFunc {
 			return
 		}
 
-		// Simulate AI processing
-		// Replace with actual AI processing logic
+		// Store the image in the database
+		receiptImage := models.ReceiptImage{
+			Image: buffer.Bytes(),
+		}
+		err = db.CreateReceiptImage(context.Background(), receiptImage)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error storing image"})
+			return
+		}
+
+		// Integrate with AI processing
+		aiResponse, err := callAIProcessing(buffer.Bytes())
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error processing image with AI"})
+			return
+		}
+
+		// Parse AI response
 		parsedReceipt := models.ReceiptResponse{
-			StoreName:   "Example Store",
-			TotalAmount: 123.45,
-			Category:    "Food",
-			ReceiptDate: time.Now().Format("2006-01-02"),
-			ReceiptTime: time.Now().Format("03:04 PM"),
+			StoreName:   aiResponse.StoreName,
+			TotalAmount: aiResponse.TotalAmount,
+			Category:    aiResponse.Category,
+			ReceiptDate: aiResponse.ReceiptDate,
+			ReceiptTime: aiResponse.ReceiptTime,
 		}
 
 		// Convert response to JSON
 		c.JSON(http.StatusOK, gin.H{"parsedReceipt": parsedReceipt})
 	}
+}
+
+// callAIProcessing is a placeholder function for actual AI processing logic
+func callAIProcessing(image []byte) (*models.AIResponse, error) {
+	// TO DO: implement actual AI processing logic
+	return &models.AIResponse{
+		StoreName:   "Example Store",
+		TotalAmount: 123.45,
+		Category:    "Food",
+		ReceiptDate: time.Now().Format("2006-01-02"),
+		ReceiptTime: time.Now().Format("03:04 PM"),
+	}, nil
 }

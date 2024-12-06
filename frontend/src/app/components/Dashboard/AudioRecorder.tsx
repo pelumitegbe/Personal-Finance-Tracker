@@ -65,7 +65,13 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onTransactionComplete, on
       }
 
       if (data.parsedTransaction) {
-        onTransactionComplete(data.parsedTransaction);
+        const transaction = {
+          description: data.parsedTransaction.description,
+          amount: parseFloat(data.parsedTransaction.amount),
+          transaction_type: data.parsedTransaction.transaction_type,
+          category: data.parsedTransaction.category,
+        };
+        onTransactionComplete(transaction);
       }
     } catch (error) {
       console.error('Error processing audio:', error);
