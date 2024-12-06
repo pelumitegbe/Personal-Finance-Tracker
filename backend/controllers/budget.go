@@ -49,7 +49,10 @@ func CreateBudget(db *database.Queries) gin.HandlerFunc {
 
 		finalBudget, err := db.CreateBudget(ctx, budgetData)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't create and store the budget data"})
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "Couldn't create and store the budget data"},
+			)
 			return
 		}
 
@@ -87,7 +90,10 @@ func MakeBudgetInvalid(db *database.Queries) gin.HandlerFunc {
 			UserID: userID,
 		})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't make the budget invalid"})
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{"error": "Couldn't make the budget invalid"},
+			)
 			return
 		}
 
@@ -117,7 +123,7 @@ func UpdateBudget(db *database.Queries) gin.HandlerFunc {
 		}
 
 		var updatedBudget models.Budget
-		if err := c.BindJSON(&updatedBudget); err != nil {
+		if err = c.BindJSON(&updatedBudget); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Request body not valid"})
 			return
 		}
