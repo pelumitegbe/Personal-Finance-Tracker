@@ -39,6 +39,7 @@ require (
 	golang.org/x/text v0.18.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	// added for receipt
     github.com/nfnt/resize v0.0.0-20180221191011-83c6f2221e53 // replace with latest version
     github.com/disintegration/imaging v1.6.3 // replace with latest version)
 )
