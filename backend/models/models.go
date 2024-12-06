@@ -40,6 +40,15 @@ type TransactionResponse struct {
 	Data   interface{} `json:"data"`
 }
 
+// added for receipt scanner
+type ReceiptResponse struct {
+	StoreName   string  `json:"store_name"`
+	TotalAmount float64 `json:"total_amount"`
+	Category    string  `json:"category"`
+	ReceiptDate string  `json:"receipt_date"`
+	ReceiptTime string  `json:"receipt_time"`
+}
+
 type Transaction struct {
 	ID              uuid.UUID `json:"id"               bson:"id"`
 	Amount          string    `json:"amount"                     validate:"required"`
