@@ -20,3 +20,17 @@ UPDATE budget
   SET valid = FALSE
   WHERE id = $1 and user_id = $2
 RETURNING *;
+
+-- name: CheckBudgetOverlap :one
+SELECT COUNT(*) > 0 AS has_overlap
+FROM budget
+WHERE user_id = $1
+  AND (
+    ($2 BETWEEN start_date AND end_date)
+    OR
+    ($3 BETWEEN start_date AND end_date)
+    OR
+    (start_date BETWEEN $2 AND $3)
+    OR
+    (end_date BETWEEN $2 AND $3)
+  );
