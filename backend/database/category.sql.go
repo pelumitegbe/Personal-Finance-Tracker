@@ -30,6 +30,16 @@ func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) 
 	return err
 }
 
+const deleteCategory = `-- name: DeleteCategory :exec
+DELETE FROM category
+WHERE id = $1
+`
+
+func (q *Queries) DeleteCategory(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteCategory, id)
+	return err
+}
+
 const getAllCategory = `-- name: GetAllCategory :many
 SELECT id, name, created_at FROM category
 `
@@ -73,28 +83,15 @@ const updateCategory = `-- name: UpdateCategory :exec
 UPDATE category
 SET name = $2
 WHERE id = $1
-RETURNING id, name, created_at;
+RETURNING id, name, created_at
 `
 
 type UpdateCategoryParams struct {
-    ID   uuid.UUID `json:"id"`
-    Name string    `json:"name"`
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
 }
 
-func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
-    row := q.db.QueryRowContext(ctx, updateCategory, arg.ID, arg.Name)
-    var i Category
-    err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
-    return i, err
-}
-
-
-const deleteCategory = `-- name: DeleteCategory :exec
-DELETE FROM category
-WHERE id = $1;
-`
-
-func (q *Queries) DeleteCategory(ctx context.Context, id uuid.UUID) error {
-    _, err := q.db.ExecContext(ctx, deleteCategory, id)
-    return err
+func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) error {
+	_, err := q.db.ExecContext(ctx, updateCategory, arg.ID, arg.Name)
+	return err
 }

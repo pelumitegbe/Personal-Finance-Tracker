@@ -47,6 +47,21 @@ func CreateBudget(db *database.Queries) gin.HandlerFunc {
 			UpdatedAt: time.Now(),
 		}
 
+		// check if another budget is on the same date
+		hasBudget, err := db.CheckBudgetOverlap(ctx, database.CheckBudgetOverlapParams{
+			UserID:      userID,
+			StartDate:   budget.StartDate,
+			StartDate_2: budget.EndDate,
+		})
+		if hasBudget {
+			c.JSON(
+				http.StatusConflict,
+				gin.H{"Error": "there is already budget on the same date"},
+			)
+			return
+		}
+
+		// create if not conflict
 		finalBudget, err := db.CreateBudget(ctx, budgetData)
 		if err != nil {
 			c.JSON(

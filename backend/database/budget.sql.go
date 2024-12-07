@@ -12,6 +12,34 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkBudgetOverlap = `-- name: CheckBudgetOverlap :one
+SELECT COUNT(*) > 0 AS has_overlap
+FROM budget
+WHERE user_id = $1
+  AND (
+    ($2 BETWEEN start_date AND end_date)
+    OR
+    ($3 BETWEEN start_date AND end_date)
+    OR
+    (start_date BETWEEN $2 AND $3)
+    OR
+    (end_date BETWEEN $2 AND $3)
+  )
+`
+
+type CheckBudgetOverlapParams struct {
+	UserID      uuid.UUID `json:"user_id"`
+	StartDate   time.Time `json:"start_date"`
+	StartDate_2 time.Time `json:"start_date_2"`
+}
+
+func (q *Queries) CheckBudgetOverlap(ctx context.Context, arg CheckBudgetOverlapParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkBudgetOverlap, arg.UserID, arg.StartDate, arg.StartDate_2)
+	var has_overlap bool
+	err := row.Scan(&has_overlap)
+	return has_overlap, err
+}
+
 const createBudget = `-- name: CreateBudget :one
 INSERT INTO budget (
   id,user_id,amount,start_date,valid,end_date,created_at,updated_at
