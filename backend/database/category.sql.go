@@ -8,7 +8,6 @@ package database
 import (
 	"context"
 	"time"
-
 	"github.com/google/uuid"
 )
 
@@ -79,7 +78,7 @@ func (q *Queries) GetCategory(ctx context.Context, name string) (Category, error
 	return i, err
 }
 
-const updateCategory = `-- name: UpdateCategory :exec
+const updateCategory = `-- name: UpdateCategory :one
 UPDATE category
 SET name = $2
 WHERE id = $1
@@ -91,7 +90,18 @@ type UpdateCategoryParams struct {
 	Name string    `json:"name"`
 }
 
-func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) error {
-	_, err := q.db.ExecContext(ctx, updateCategory, arg.ID, arg.Name)
-	return err
+// func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) error {
+// 	_, err := q.db.ExecContext(ctx, updateCategory, arg.ID, arg.Name)
+// 	return err
+// }
+
+func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
+	row := q.db.QueryRowContext(ctx, updateCategory, arg.ID, arg.Name)
+	var i Category
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+	)
+	return i, err
 }
+

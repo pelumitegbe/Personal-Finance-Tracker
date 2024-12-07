@@ -61,33 +61,31 @@ func GetAllCategory(db *database.Queries) gin.HandlerFunc {
 
 func UpdateCategory(db *database.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
-			ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
-			defer cancel()
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
 
-			var category models.Category
-			if err := c.BindJSON(&category); err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{
-							"error": "Request body not valid",
-					})
-					return
-			}
+		var category models.Category
+		if err := c.BindJSON(&category); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Request body not valid"})
+			return
+		}
 
-			id := c.Param("id")
-			categoryData := database.UpdateCategoryParams{
-					ID:   uuid.MustParse(id),
-					Name: category.Name,
-			}
+		id := c.Param("id")
+		categoryData := database.UpdateCategoryParams{
+			ID:   uuid.MustParse(id),
+			Name: category.Name,
+		}
 
-			_, err := db.UpdateCategory(ctx, categoryData)
-			if err != nil {
-					c.JSON(
-							http.StatusInternalServerError,
-							gin.H{"error": "Couldn't update the category"},
-					)
-					return
-			}
+		updatedCategory, err := db.UpdateCategory(ctx, categoryData)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Couldn't update the category"})
+			return
+		}
 
-			c.JSON(http.StatusOK, gin.H{"Success": "Category updated successfully"})
+		c.JSON(http.StatusOK, gin.H{
+			"success": "Category updated successfully",
+			"data":    updatedCategory,
+		})
 	}
 }
 

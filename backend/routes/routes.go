@@ -13,7 +13,7 @@ func UserRoutes(incomingRoutes *gin.Engine, db *database.Queries) {
 	incomingRoutes.POST("/users/signup", controllers.Signup(db))
 	incomingRoutes.POST("/users/login", controllers.Login(db))
 	incomingRoutes.POST("/auth/refresh-token", controllers.GenerateAccessTokenFromRefreshToken(db))
-	incomingRoutes.POST("/process_receipt", controllers.ProcessReceipt(db))
+	// incomingRoutes.POST("/process_receipt", controllers.ProcessReceipt(db))
 
 	// admin routes
 	adminRoutes := incomingRoutes.Group("/admin")
